@@ -27,7 +27,7 @@
 	let team2Name = $state(team2_label());
 	let trackPlayers = $state(false);
 	let teamSize = $state<1 | 2 | 3>(2);
-	let team1Players = $state<readonly string[]>([me()]);
+	let team1Players = $state<readonly string[]>([me(), defaultPlayerName(2)]);
 	let team2Players = $state<readonly string[]>([defaultPlayerName(3), defaultPlayerName(4)]);
 
 	const STORAGE_KEY = 'boule-player-settings';
@@ -36,23 +36,18 @@
 		return player_name({ number: n });
 	}
 
-	function ensurePlayerSlots(
-		players: readonly string[],
-		size: number,
-		startIndex: number,
-	): readonly string[] {
-		const sliced = players.slice(0, size);
-		const padding = Array.from({ length: Math.max(0, size - sliced.length) }, (_, i) =>
-			defaultPlayerName(startIndex + sliced.length + i),
-		);
-		return [...sliced, ...padding];
+	function buildTeam1Defaults(size: number): readonly string[] {
+		return [me(), ...Array.from({ length: size - 1 }, (_, i) => defaultPlayerName(i + 2))];
+	}
+
+	function buildTeam2Defaults(size: number): readonly string[] {
+		return Array.from({ length: size }, (_, i) => defaultPlayerName(size + i + 1));
 	}
 
 	function handleTeamSizeChange(size: 1 | 2 | 3) {
 		teamSize = size;
-		const t1 = ensurePlayerSlots(team1Players, size, 1);
-		team1Players = [me(), ...t1.slice(1)];
-		team2Players = ensurePlayerSlots(team2Players, size, size + 1);
+		team1Players = buildTeam1Defaults(size);
+		team2Players = buildTeam2Defaults(size);
 	}
 
 	onMount(() => {
@@ -63,11 +58,21 @@
 				if (typeof settings.trackPlayers === 'boolean') trackPlayers = settings.trackPlayers;
 				if ([1, 2, 3].includes(settings.teamSize)) teamSize = settings.teamSize;
 				if (Array.isArray(settings.team1Players)) {
-					const loaded = ensurePlayerSlots(settings.team1Players, teamSize, 1);
-					team1Players = [me(), ...loaded.slice(1)];
+					const saved: readonly string[] = settings.team1Players;
+					team1Players = [
+						me(),
+						...Array.from(
+							{ length: teamSize - 1 },
+							(_, i) => saved[i + 1] ?? defaultPlayerName(i + 2),
+						),
+					];
 				}
 				if (Array.isArray(settings.team2Players)) {
-					team2Players = ensurePlayerSlots(settings.team2Players, teamSize, teamSize + 1);
+					const saved: readonly string[] = settings.team2Players;
+					team2Players = Array.from(
+						{ length: teamSize },
+						(_, i) => saved[i] ?? defaultPlayerName(teamSize + i + 1),
+					);
 				}
 			}
 		} catch {
