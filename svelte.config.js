@@ -6,6 +6,7 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({ fallback: 'index.html', pages: 'build', assets: 'build' }),
+		paths: { base: process.env.GITHUB_PAGES ? '/boule-app' : '' },
 		prerender: { entries: ['*'] },
 	},
 };

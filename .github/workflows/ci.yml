@@ -31,6 +31,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: just setup && just build
+        env: { GITHUB_PAGES: 'true' }
       - uses: actions/upload-pages-artifact@v3
         with: { path: build }
       - id: deploy
