@@ -121,15 +121,13 @@ export default ts.config(
 				...globals.node,
 			},
 			parserOptions: {
-				projectService: {
-					allowDefaultProject: ['src/service-worker.ts'],
-				},
+				projectService: true,
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
 	},
 
 	{
-		ignores: ['build/', '.svelte-kit/', 'dist/', 'src/lib/paraglide/'],
+		ignores: ['build/', '.svelte-kit/', 'dist/', 'src/lib/paraglide/', 'src/service-worker.ts'],
 	},
 );
