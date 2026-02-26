@@ -3,4 +3,5 @@ build/
 .svelte-kit/
 static/
 src/lib/paraglide/
+project.inlang/
 .claude/settings.local.json
