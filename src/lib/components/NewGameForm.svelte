@@ -9,6 +9,7 @@
 		player_name,
 		me,
 	} from '$lib/paraglide/messages.js';
+	import { Switch } from '@skeletonlabs/skeleton-svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
 	import { onMount } from 'svelte';
 
@@ -138,7 +139,39 @@
 	>
 		<h1 class="h3 text-center font-bold">{new_game()}</h1>
 
-		<label class="flex flex-col gap-1">
+		<div class="flex min-h-12 items-center">
+			<Switch
+				checked={trackPlayers}
+				onCheckedChange={(details) => (trackPlayers = details.checked)}
+			>
+				<Switch.Control>
+					<Switch.Thumb />
+				</Switch.Control>
+				<Switch.Label>{track_players()}</Switch.Label>
+				<Switch.HiddenInput />
+			</Switch>
+		</div>
+
+		{#if trackPlayers}
+			<div>
+				<span class="text-base font-medium">{team_size()}</span>
+				<div class="mt-2 flex gap-2">
+					{#each [1, 2, 3] as size (size)}
+						<button
+							type="button"
+							class="btn min-h-12 flex-1 {teamSize === size
+								? 'preset-filled-primary-500'
+								: 'preset-outlined-surface-500'}"
+							onclick={() => handleTeamSizeChange(size as 1 | 2 | 3)}
+						>
+							{size}v{size}
+						</button>
+					{/each}
+				</div>
+			</div>
+		{/if}
+
+		<div class="flex flex-col gap-1">
 			<span class="text-base font-medium">{team1_label()}</span>
 			<input
 				type="text"
@@ -146,50 +179,15 @@
 				bind:value={team1Name}
 				placeholder={team1_label()}
 			/>
-		</label>
-
-		<label class="flex flex-col gap-1">
-			<span class="text-base font-medium">{team2_label()}</span>
-			<input
-				type="text"
-				class="preset-form-input w-full"
-				bind:value={team2Name}
-				placeholder={team2_label()}
-			/>
-		</label>
-
-		<label class="flex min-h-12 cursor-pointer items-center gap-3">
-			<input type="checkbox" class="h-6 w-6" bind:checked={trackPlayers} />
-			<span class="text-base font-medium">{track_players()}</span>
-		</label>
-
-		{#if trackPlayers}
-			<div class="space-y-4">
-				<div>
-					<span class="text-base font-medium">{team_size()}</span>
-					<div class="mt-2 flex gap-2">
-						{#each [1, 2, 3] as size (size)}
-							<button
-								type="button"
-								class="btn min-h-12 flex-1 {teamSize === size
-									? 'preset-filled-primary-500'
-									: 'preset-outlined-surface-500'}"
-								onclick={() => handleTeamSizeChange(size as 1 | 2 | 3)}
-							>
-								{size}v{size}
-							</button>
-						{/each}
-					</div>
-				</div>
-
-				<div class="space-y-2">
-					<span class="text-base font-medium">{team1Name || team1_label()}</span>
+			{#if trackPlayers}
+				<div class="ml-4 mt-1 flex flex-col gap-2">
 					{#each Array.from({ length: teamSize }, (_, i) => i) as i (i)}
 						{#if i === 0}
 							<input
 								type="text"
-								class="preset-form-input w-full opacity-70"
+								class="preset-form-input w-full cursor-default opacity-60"
 								value={me()}
+								tabindex={-1}
 								readonly
 							/>
 						{:else}
@@ -205,9 +203,19 @@
 						{/if}
 					{/each}
 				</div>
+			{/if}
+		</div>
 
-				<div class="space-y-2">
-					<span class="text-base font-medium">{team2Name || team2_label()}</span>
+		<div class="flex flex-col gap-1">
+			<span class="text-base font-medium">{team2_label()}</span>
+			<input
+				type="text"
+				class="preset-form-input w-full"
+				bind:value={team2Name}
+				placeholder={team2_label()}
+			/>
+			{#if trackPlayers}
+				<div class="ml-4 mt-1 flex flex-col gap-2">
 					{#each Array.from({ length: teamSize }, (_, i) => i) as i (i)}
 						<input
 							type="text"
@@ -220,8 +228,8 @@
 						/>
 					{/each}
 				</div>
-			</div>
-		{/if}
+			{/if}
+		</div>
 
 		<button type="submit" class="preset-page-action mt-2">{start_game()}</button>
 
