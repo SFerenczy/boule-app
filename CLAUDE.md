@@ -98,6 +98,16 @@ Standards that apply regardless of language or component.
 - **Error handling at boundaries.** Validate at system edges (user input, external APIs, file I/O). Trust internal code.
 - **Tests prove behavior.** Tests are documentation. They describe what the system does, not how it's implemented. Prefer integration tests over unit tests when the boundary is clear.
 
+### Visual Verification
+
+After writing or modifying UI code, verify visually before considering work done:
+
+1. Run `/screenshot <route>` to capture the affected screen
+2. Read the screenshot and check against outdoor readability rules (see [DESIGN.md](DESIGN.md))
+3. Fix issues and re-screenshot until it passes
+
+This is not optional. `just check` validates code quality; screenshots validate UX quality.
+
 ### Documentation
 
 - **Docs live next to code.** Component-level `CLAUDE.md` files, not a top-level `docs/` dump.
