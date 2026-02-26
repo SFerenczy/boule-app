@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Game } from '$lib/types';
 	import TeamCard from './TeamCard.svelte';
+	import PlayerSelectModal from './PlayerSelectModal.svelte';
 	import { Dialog } from '@skeletonlabs/skeleton-svelte';
 	import {
 		app_title,
@@ -13,16 +14,19 @@
 
 	const {
 		game,
-		onUpdate,
+		trackingEnabled = false,
+		onRecord,
 		onEndGame,
 		onUndo,
 		canUndo,
 	}: {
 		readonly game: Game;
-		readonly onUpdate: (
+		readonly trackingEnabled?: boolean;
+		readonly onRecord: (
 			teamIndex: 0 | 1,
 			category: 'pointing' | 'shooting',
 			type: 'success' | 'fail',
+			player: string,
 		) => void;
 		readonly onEndGame: () => void;
 		readonly onUndo?: () => void;
@@ -30,6 +34,37 @@
 	} = $props();
 
 	let confirmOpen = $state(false);
+	let playerModalOpen = $state(false);
+	let pendingAction = $state<{
+		readonly teamIndex: 0 | 1;
+		readonly category: 'pointing' | 'shooting';
+		readonly type: 'success' | 'fail';
+	} | null>(null);
+
+	function handleStatTap(
+		teamIndex: 0 | 1,
+		category: 'pointing' | 'shooting',
+		type: 'success' | 'fail',
+	) {
+		if (trackingEnabled) {
+			pendingAction = { teamIndex, category, type };
+			playerModalOpen = true;
+		} else {
+			onRecord(teamIndex, category, type, 'Anonymous');
+		}
+	}
+
+	function handlePlayerSelect(player: string) {
+		if (pendingAction) {
+			onRecord(pendingAction.teamIndex, pendingAction.category, pendingAction.type, player);
+			pendingAction = null;
+		}
+		playerModalOpen = false;
+	}
+
+	const modalPlayers = $derived(
+		pendingAction ? (pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players) : [],
+	);
 </script>
 
 <div class="flex min-h-screen flex-col p-4">
@@ -40,18 +75,18 @@
 	<div class="mt-4 flex flex-col">
 		<TeamCard
 			teamName={game.team1Name}
-			stats={game.team1Stats}
+			history={game.history}
 			teamIndex={0}
-			onUpdate={(category, type) => onUpdate(0, category, type)}
+			onUpdate={(category, type) => handleStatTap(0, category, type)}
 		/>
 
 		<hr class="my-4" />
 
 		<TeamCard
 			teamName={game.team2Name}
-			stats={game.team2Stats}
+			history={game.history}
 			teamIndex={1}
-			onUpdate={(category, type) => onUpdate(1, category, type)}
+			onUpdate={(category, type) => handleStatTap(1, category, type)}
 		/>
 	</div>
 
@@ -101,3 +136,13 @@
 		</Dialog.Content>
 	</Dialog.Positioner>
 </Dialog>
+
+<PlayerSelectModal
+	open={playerModalOpen}
+	players={modalPlayers}
+	onSelect={handlePlayerSelect}
+	onClose={() => {
+		playerModalOpen = false;
+		pendingAction = null;
+	}}
+/>

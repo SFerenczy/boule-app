@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import { userEvent } from '@testing-library/user-event';
-import { db, createGame, getActiveGame, updateStats, completeGame } from '$lib/db';
+import { db, createGame, getActiveGame, recordAction, completeGame } from '$lib/db';
 import Page from './+page.svelte';
 
 beforeEach(async () => {
@@ -82,9 +82,24 @@ describe('Scoring Screen Page', () => {
 		const id = await createGame(db, 'Team A', 'Team B');
 
 		// Set up stats via repository to avoid double-tap guard timing issues
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'fail');
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'fail',
+		});
 
 		render(Page);
 		await screen.findByText('Team A');
@@ -120,9 +135,9 @@ describe('Scoring Screen Page', () => {
 		const user = userEvent.setup();
 		await user.click(startButton);
 
-		// Should now show scoring screen with default team names
-		expect(await screen.findByText('Team 1')).toBeInTheDocument();
-		expect(screen.getByText('Team 2')).toBeInTheDocument();
+		// Should now show scoring screen with default team names (We/They)
+		expect(await screen.findByText('We')).toBeInTheDocument();
+		expect(screen.getByText('They')).toBeInTheDocument();
 
 		// Verify the game was persisted
 		const active = await getActiveGame(db);
@@ -148,9 +163,9 @@ describe('Undo functionality', () => {
 		const undoButton = screen.getByRole('button', { name: /undo/i });
 		await user.click(undoButton);
 
-		// Stat should be reverted — summary shows dash when no data
+		// Stat should be reverted — history should be empty
 		const game = await getActiveGame(db);
-		expect(game?.team1Stats.pointingSuccess).toBe(0);
+		expect(game?.history).toHaveLength(0);
 	});
 
 	it('undo button is disabled when no history', async () => {
@@ -169,10 +184,30 @@ describe('Per-team success summary', () => {
 		const id = await createGame(db, 'Team A', 'Team B');
 
 		// 2 pointing successes, 1 pointing fail, 1 shooting success = 3/4 = 75%
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'fail');
-		await updateStats(db, id, 0, 'shooting', 'success');
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'fail',
+		});
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'shooting',
+			type: 'success',
+		});
 
 		render(Page);
 		await screen.findByText('Team A');

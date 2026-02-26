@@ -1,21 +1,23 @@
 <script lang="ts">
-	import type { TeamStats } from '$lib/types';
+	import type { HistoryEntry } from '$lib/types';
+	import { deriveTeamStats } from '$lib/stats';
 	import StatRow from './StatRow.svelte';
 	import TeamSummary from './TeamSummary.svelte';
 	import { pointing, shooting } from '$lib/paraglide/messages.js';
 
 	const {
 		teamName,
-		stats,
-		onUpdate,
+		history,
 		teamIndex,
+		onUpdate,
 	}: {
 		readonly teamName: string;
-		readonly stats: TeamStats;
-		readonly onUpdate: (category: 'pointing' | 'shooting', type: 'success' | 'fail') => void;
+		readonly history: readonly HistoryEntry[];
 		readonly teamIndex: 0 | 1;
+		readonly onUpdate: (category: 'pointing' | 'shooting', type: 'success' | 'fail') => void;
 	} = $props();
 
+	const stats = $derived(deriveTeamStats(history, teamIndex));
 	const accentClass = $derived(teamIndex === 0 ? 'border-primary-500' : 'border-secondary-600');
 </script>
 

@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { liveQuery } from 'dexie';
-	import type { Game, HistoryEntry } from '$lib/types';
-	import { db, createGame, updateStats, decrementStats, completeGame } from '$lib/db';
+	import type { Game } from '$lib/types';
+	import { db, createGame, recordAction, undoLastAction, completeGame } from '$lib/db';
 	import { loading as loadingMsg } from '$lib/paraglide/messages.js';
 	import NewGameForm from '$lib/components/NewGameForm.svelte';
 	import ScoringScreen from '$lib/components/ScoringScreen.svelte';
 
 	let activeGame: Game | undefined = $state(undefined);
 	let loading = $state(true);
-	let history: readonly HistoryEntry[] = $state([]);
 
 	onMount(() => {
 		const subscription = liveQuery(() =>
@@ -27,32 +26,43 @@
 		return () => subscription.unsubscribe();
 	});
 
-	async function handleStart(team1Name: string, team2Name: string) {
-		history = [];
-		await createGame(db, team1Name, team2Name);
+	function isTrackingEnabled(game: Game): boolean {
+		return !(
+			game.team1Players.length === 1 &&
+			game.team1Players[0] === 'Anonymous' &&
+			game.team2Players.length === 1 &&
+			game.team2Players[0] === 'Anonymous'
+		);
 	}
 
-	async function handleUpdate(
+	const trackingEnabled = $derived(activeGame ? isTrackingEnabled(activeGame) : false);
+
+	async function handleStart(
+		team1Name: string,
+		team2Name: string,
+		team1Players: readonly string[],
+		team2Players: readonly string[],
+	) {
+		await createGame(db, team1Name, team2Name, team1Players, team2Players);
+	}
+
+	async function handleRecord(
 		teamIndex: 0 | 1,
 		category: 'pointing' | 'shooting',
 		type: 'success' | 'fail',
+		player: string,
 	) {
 		if (!activeGame?.id) return;
-		history = [...history, { teamIndex, category, type }];
-		await updateStats(db, activeGame.id, teamIndex, category, type);
+		await recordAction(db, activeGame.id, { teamIndex, player, category, type });
 	}
 
 	async function handleUndo() {
-		if (!activeGame?.id || history.length === 0) return;
-		const last = history[history.length - 1];
-		if (!last) return;
-		history = history.slice(0, -1);
-		await decrementStats(db, activeGame.id, last.teamIndex, last.category, last.type);
+		if (!activeGame?.id || activeGame.history.length === 0) return;
+		await undoLastAction(db, activeGame.id);
 	}
 
 	async function handleEndGame() {
 		if (!activeGame?.id) return;
-		history = [];
 		await completeGame(db, activeGame.id);
 	}
 </script>
@@ -67,10 +77,11 @@
 {:else if activeGame}
 	<ScoringScreen
 		game={activeGame}
-		onUpdate={handleUpdate}
+		{trackingEnabled}
+		onRecord={handleRecord}
 		onEndGame={handleEndGame}
 		onUndo={handleUndo}
-		canUndo={history.length > 0}
+		canUndo={activeGame.history.length > 0}
 	/>
 {:else}
 	<NewGameForm onStart={handleStart} />
