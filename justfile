@@ -1,8 +1,9 @@
 # Boule App task runner
 
-# Install all dependencies
+# Install all dependencies and generate artifacts
 setup:
     pnpm install
+    pnpm exec svelte-kit sync
 
 # Start dev server
 dev:
