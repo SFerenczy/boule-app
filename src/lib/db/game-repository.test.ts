@@ -1,7 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 import { BoubleDB } from './database';
-import { createGame, getActiveGame, updateStats, completeGame } from './game-repository';
+import {
+	createGame,
+	getActiveGame,
+	updateStats,
+	decrementStats,
+	completeGame,
+} from './game-repository';
 
 let db: BoubleDB;
 
@@ -109,6 +115,43 @@ describe('updateStats', () => {
 
 	it('throws for unknown game id', async () => {
 		await expect(updateStats(db, 999, 0, 'pointing', 'success')).rejects.toThrow(
+			'Game 999 not found',
+		);
+	});
+});
+
+describe('decrementStats', () => {
+	it('decrements the correct field', async () => {
+		const id = await createGame(db, 'Team A', 'Team B');
+		await updateStats(db, id, 0, 'pointing', 'success');
+		await updateStats(db, id, 0, 'pointing', 'success');
+		await decrementStats(db, id, 0, 'pointing', 'success');
+		const game = await db.games.get(id);
+		expect(game?.team1Stats.pointingSuccess).toBe(1);
+	});
+
+	it('floors at zero (no negative stats)', async () => {
+		const id = await createGame(db, 'Team A', 'Team B');
+		await decrementStats(db, id, 0, 'pointing', 'success');
+		const game = await db.games.get(id);
+		expect(game?.team1Stats.pointingSuccess).toBe(0);
+	});
+
+	it('does not affect other counters', async () => {
+		const id = await createGame(db, 'Team A', 'Team B');
+		await updateStats(db, id, 0, 'pointing', 'success');
+		await updateStats(db, id, 0, 'pointing', 'fail');
+		await updateStats(db, id, 0, 'shooting', 'success');
+		await decrementStats(db, id, 0, 'pointing', 'success');
+		const game = await db.games.get(id);
+		expect(game?.team1Stats.pointingSuccess).toBe(0);
+		expect(game?.team1Stats.pointingFail).toBe(1);
+		expect(game?.team1Stats.shootingSuccess).toBe(1);
+		expect(game?.team1Stats.shootingFail).toBe(0);
+	});
+
+	it('throws for unknown game id', async () => {
+		await expect(decrementStats(db, 999, 0, 'pointing', 'success')).rejects.toThrow(
 			'Game 999 not found',
 		);
 	});

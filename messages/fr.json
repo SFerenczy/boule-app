@@ -13,5 +13,7 @@
 	"cancel": "Annuler",
 	"success_aria": "{label} réussi",
 	"fail_aria": "{label} raté",
-	"language": "Langue"
+	"language": "Langue",
+	"success_summary": "Réussite",
+	"undo": "Annuler"
 }

@@ -7,6 +7,12 @@ export interface TeamStats {
 	readonly shootingFail: number;
 }
 
+export interface HistoryEntry {
+	readonly teamIndex: 0 | 1;
+	readonly category: 'pointing' | 'shooting';
+	readonly type: 'success' | 'fail';
+}
+
 export interface Game {
 	readonly id?: number;
 	readonly team1Name: string;

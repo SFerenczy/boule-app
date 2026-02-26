@@ -51,6 +51,31 @@ export const updateStats = async (
 	await db.games.update(gameId, { [statsKey]: updated });
 };
 
+export const decrementStats = async (
+	db: BoubleDB,
+	gameId: number,
+	teamIndex: 0 | 1,
+	category: 'pointing' | 'shooting',
+	type: 'success' | 'fail',
+): Promise<void> => {
+	const game = await db.games.get(gameId);
+	if (!game) throw new Error(`Game ${gameId} not found`);
+
+	const statsKey = teamIndex === 0 ? 'team1Stats' : 'team2Stats';
+	const statField =
+		category === 'pointing'
+			? type === 'success'
+				? 'pointingSuccess'
+				: 'pointingFail'
+			: type === 'success'
+				? 'shootingSuccess'
+				: 'shootingFail';
+
+	const current = game[statsKey][statField];
+	const updated = { ...game[statsKey], [statField]: Math.max(0, current - 1) };
+	await db.games.update(gameId, { [statsKey]: updated });
+};
+
 export const completeGame = async (db: BoubleDB, gameId: number): Promise<void> => {
 	await db.games.update(gameId, { status: 'completed', endedAt: new Date() });
 };
