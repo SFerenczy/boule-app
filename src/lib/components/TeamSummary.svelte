@@ -13,10 +13,10 @@
 	);
 </script>
 
-<div class="text-surface-600 dark:text-surface-400 flex items-center justify-between text-sm">
+<div class="text-surface-700 dark:text-surface-300 flex items-center justify-between text-base">
 	<span>{success_summary()}</span>
 	{#if percentage !== null}
-		<span class="font-semibold">{percentage}% ({totalSuccesses}/{totalAttempts})</span>
+		<span class="font-bold">{percentage}% ({totalSuccesses}/{totalAttempts})</span>
 	{:else}
 		<span>–</span>
 	{/if}

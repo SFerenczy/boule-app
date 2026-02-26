@@ -29,9 +29,7 @@
 	}
 </script>
 
-<div class="flex items-center gap-3 py-1">
-	<span class="w-20 shrink-0 text-sm font-medium">{label}</span>
-
+<div class="flex w-full items-center gap-2">
 	<button
 		type="button"
 		class="preset-stat-tap-success"
@@ -41,13 +39,16 @@
 		✓
 	</button>
 
-	<div class="flex flex-1 flex-col items-center justify-center text-center">
+	<div class="flex w-20 shrink-0 flex-col items-center justify-center text-center">
 		{#if percentage !== null}
-			<span class="text-lg font-bold leading-tight">{percentage}%</span>
-			<span class="text-surface-700 dark:text-surface-300 text-sm">{successes}/{total}</span>
+			<span class="leading-tight">
+				<span class="text-lg font-bold">{percentage}%</span>
+				<span class="text-surface-700 dark:text-surface-300 text-xs">{successes}/{total}</span>
+			</span>
 		{:else}
-			<span class="text-surface-600 dark:text-surface-400 text-xl">–</span>
+			<span class="text-surface-500 text-lg">–</span>
 		{/if}
+		<span class="text-surface-700 dark:text-surface-300 text-xs font-medium">{label}</span>
 	</div>
 
 	<button

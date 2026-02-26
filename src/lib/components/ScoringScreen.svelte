@@ -55,11 +55,11 @@
 		/>
 	</div>
 
-	<div class="mt-auto flex gap-2 pt-4">
+	<div class="mt-6 flex gap-4 pt-4">
 		{#if onUndo}
 			<button
 				type="button"
-				class="btn btn-lg preset-tonal-surface flex-1"
+				class="btn preset-outlined-surface-500 flex-1"
 				disabled={!canUndo}
 				onclick={onUndo}
 			>
@@ -68,7 +68,7 @@
 		{/if}
 		<button
 			type="button"
-			class="btn btn-lg preset-outlined-error-500 flex-1"
+			class="btn preset-outlined-error-500 flex-1"
 			onclick={() => (confirmOpen = true)}
 		>
 			{end_game()}
