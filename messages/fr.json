@@ -2,8 +2,8 @@
 	"app_title": "Boule",
 	"loading": "Chargement",
 	"new_game": "Nouvelle partie",
-	"team1_label": "Équipe 1",
-	"team2_label": "Équipe 2",
+	"team1_label": "Nous",
+	"team2_label": "Eux",
 	"start_game": "Lancer la partie",
 	"pointing": "Pointage",
 	"shooting": "Tir",
@@ -15,5 +15,11 @@
 	"fail_aria": "{label} raté",
 	"language": "Langue",
 	"success_summary": "Réussite",
-	"undo": "Annuler"
+	"undo": "Annuler",
+	"track_players": "Suivre les joueurs",
+	"team_size": "Taille d'équipe",
+	"player_name": "Joueur {number}",
+	"me": "Moi",
+	"who_played": "Qui a joué ?",
+	"anonymous": "Anonyme"
 }

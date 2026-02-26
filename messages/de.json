@@ -2,8 +2,8 @@
 	"app_title": "Boule",
 	"loading": "Laden",
 	"new_game": "Neues Spiel",
-	"team1_label": "Team 1",
-	"team2_label": "Team 2",
+	"team1_label": "Wir",
+	"team2_label": "Sie",
 	"start_game": "Spiel starten",
 	"pointing": "Legen",
 	"shooting": "Schießen",
@@ -15,5 +15,11 @@
 	"fail_aria": "{label} Fehler",
 	"language": "Sprache",
 	"success_summary": "Erfolg",
-	"undo": "Rückgängig"
+	"undo": "Rückgängig",
+	"track_players": "Spieler erfassen",
+	"team_size": "Teamgröße",
+	"player_name": "Spieler {number}",
+	"me": "Ich",
+	"who_played": "Wer hat gespielt?",
+	"anonymous": "Anonym"
 }
