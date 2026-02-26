@@ -8,12 +8,15 @@
 		end_game_title,
 		end_game_description,
 		cancel,
+		undo,
 	} from '$lib/paraglide/messages.js';
 
 	const {
 		game,
 		onUpdate,
 		onEndGame,
+		onUndo,
+		canUndo,
 	}: {
 		readonly game: Game;
 		readonly onUpdate: (
@@ -22,23 +25,27 @@
 			type: 'success' | 'fail',
 		) => void;
 		readonly onEndGame: () => void;
+		readonly onUndo?: () => void;
+		readonly canUndo?: boolean;
 	} = $props();
 
 	let confirmOpen = $state(false);
 </script>
 
-<div class="flex min-h-screen flex-col gap-4 p-4">
+<div class="flex min-h-screen flex-col p-4">
 	<header class="pt-2 text-center">
 		<h1 class="h2 font-bold">{app_title()}</h1>
 	</header>
 
-	<div class="flex flex-col gap-4">
+	<div class="mt-4 flex flex-col">
 		<TeamCard
 			teamName={game.team1Name}
 			stats={game.team1Stats}
 			teamIndex={0}
 			onUpdate={(category, type) => onUpdate(0, category, type)}
 		/>
+
+		<hr class="my-4" />
 
 		<TeamCard
 			teamName={game.team2Name}
@@ -48,13 +55,25 @@
 		/>
 	</div>
 
-	<button
-		type="button"
-		class="btn btn-lg preset-outlined-error-500 mt-auto w-full"
-		onclick={() => (confirmOpen = true)}
-	>
-		{end_game()}
-	</button>
+	<div class="mt-auto flex gap-2 pt-4">
+		{#if onUndo}
+			<button
+				type="button"
+				class="btn btn-lg preset-tonal-surface flex-1"
+				disabled={!canUndo}
+				onclick={onUndo}
+			>
+				{undo()}
+			</button>
+		{/if}
+		<button
+			type="button"
+			class="btn btn-lg preset-outlined-error-500 flex-1"
+			onclick={() => (confirmOpen = true)}
+		>
+			{end_game()}
+		</button>
+	</div>
 </div>
 
 <Dialog open={confirmOpen} onOpenChange={(e) => (confirmOpen = e.open)}>

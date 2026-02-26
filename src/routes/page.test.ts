@@ -129,3 +129,70 @@ describe('Scoring Screen Page', () => {
 		expect(active).toBeDefined();
 	});
 });
+
+describe('Undo functionality', () => {
+	it('undo reverts last stat increment', async () => {
+		await createGame(db, 'Team A', 'Team B');
+
+		render(Page);
+		await screen.findByText('Team A');
+
+		const user = userEvent.setup();
+		const successButtons = screen.getAllByRole('button', { name: /success/i });
+		await user.click(successButtons[0]!);
+
+		// Verify stat was recorded
+		expect(await screen.findByText('100%')).toBeInTheDocument();
+
+		// Now undo
+		const undoButton = screen.getByRole('button', { name: /undo/i });
+		await user.click(undoButton);
+
+		// Stat should be reverted — summary shows dash when no data
+		const game = await getActiveGame(db);
+		expect(game?.team1Stats.pointingSuccess).toBe(0);
+	});
+
+	it('undo button is disabled when no history', async () => {
+		await createGame(db, 'Team A', 'Team B');
+
+		render(Page);
+		await screen.findByText('Team A');
+
+		const undoButton = screen.getByRole('button', { name: /undo/i });
+		expect(undoButton).toBeDisabled();
+	});
+});
+
+describe('Per-team success summary', () => {
+	it('shows combined percentage across pointing and shooting', async () => {
+		const id = await createGame(db, 'Team A', 'Team B');
+
+		// 2 pointing successes, 1 pointing fail, 1 shooting success = 3/4 = 75%
+		await updateStats(db, id, 0, 'pointing', 'success');
+		await updateStats(db, id, 0, 'pointing', 'success');
+		await updateStats(db, id, 0, 'pointing', 'fail');
+		await updateStats(db, id, 0, 'shooting', 'success');
+
+		render(Page);
+		await screen.findByText('Team A');
+
+		// The team summary should show 75% (3/4)
+		expect(screen.getByText('75% (3/4)')).toBeInTheDocument();
+	});
+
+	it('shows dash when no data', async () => {
+		await createGame(db, 'Team A', 'Team B');
+
+		render(Page);
+		await screen.findByText('Team A');
+
+		// Both summaries should show "–" (en-dash)
+		const summaryLabels = screen.getAllByText('Success');
+		expect(summaryLabels).toHaveLength(2);
+
+		// The dash characters should be present
+		const dashes = screen.getAllByText('–');
+		expect(dashes.length).toBeGreaterThanOrEqual(2);
+	});
+});
