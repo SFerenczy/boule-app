@@ -24,6 +24,11 @@
 	@apply input preset-outlined-surface-500;
 }
 
+/* Stat row background container inside flat team sections */
+.preset-stat-row {
+	@apply flex items-center gap-3 rounded-lg bg-surface-100 px-3 py-2 dark:bg-surface-800;
+}
+
 /* Full-width primary CTA at the bottom of a screen (Start Game, confirm actions) */
 .preset-page-action {
 	@apply btn btn-lg preset-filled-primary-500 w-full;

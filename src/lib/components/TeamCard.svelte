@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TeamStats } from '$lib/types';
 	import StatRow from './StatRow.svelte';
+	import TeamSummary from './TeamSummary.svelte';
 	import { pointing, shooting } from '$lib/paraglide/messages.js';
 
 	const {
@@ -15,13 +16,12 @@
 		readonly teamIndex: 0 | 1;
 	} = $props();
 
-	const accentClass = $derived(teamIndex === 0 ? 'bg-primary-500' : 'bg-secondary-600');
+	const accentClass = $derived(teamIndex === 0 ? 'border-primary-500' : 'border-secondary-600');
 </script>
 
-<div class="card preset-outlined-surface-500 overflow-hidden p-0">
-	<div class={`h-1.5 ${accentClass}`}></div>
-	<div class="space-y-2 p-4">
-		<h2 class="h2 font-semibold">{teamName}</h2>
+<section class={`space-y-2 border-l-4 pl-4 ${accentClass}`}>
+	<h2 class="h2 font-semibold">{teamName}</h2>
+	<div class="preset-stat-row">
 		<StatRow
 			label={pointing()}
 			successes={stats.pointingSuccess}
@@ -29,6 +29,8 @@
 			onSuccess={() => onUpdate('pointing', 'success')}
 			onFail={() => onUpdate('pointing', 'fail')}
 		/>
+	</div>
+	<div class="preset-stat-row">
 		<StatRow
 			label={shooting()}
 			successes={stats.shootingSuccess}
@@ -37,4 +39,5 @@
 			onFail={() => onUpdate('shooting', 'fail')}
 		/>
 	</div>
-</div>
+	<TeamSummary {stats} />
+</section>
