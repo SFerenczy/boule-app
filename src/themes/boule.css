@@ -198,7 +198,7 @@
 	--color-error-contrast-900: var(--color-error-contrast-light);
 	--color-error-contrast-950: var(--color-error-contrast-light);
 
-	/* Surface — warm-tinted neutral (sand/parchment in light, warm dark brown in dark) */
+	/* Surface — warm-tinted neutral (sand/parchment in light, warm charcoal in dark) */
 	--color-surface-50: oklch(0.98 0.008 50);
 	--color-surface-100: oklch(0.94 0.008 50);
 	--color-surface-200: oklch(0.87 0.007 50);
@@ -206,10 +206,10 @@
 	--color-surface-400: oklch(0.68 0.006 46);
 	--color-surface-500: oklch(0.56 0.006 44);
 	--color-surface-600: oklch(0.47 0.005 42);
-	--color-surface-700: oklch(0.38 0.005 40);
-	--color-surface-800: oklch(0.3 0.005 38);
-	--color-surface-900: oklch(0.22 0.004 36);
-	--color-surface-950: oklch(0.15 0.004 35);
+	--color-surface-700: oklch(0.4 0.006 40);
+	--color-surface-800: oklch(0.33 0.006 38);
+	--color-surface-900: oklch(0.27 0.005 36);
+	--color-surface-950: oklch(0.21 0.005 35);
 	--color-surface-contrast-dark: var(--color-surface-950);
 	--color-surface-contrast-light: var(--color-surface-50);
 	--color-surface-contrast-50: var(--color-surface-contrast-dark);

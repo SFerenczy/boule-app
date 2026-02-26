@@ -18,7 +18,10 @@
 	<span class="text-surface-700 dark:text-surface-300">{languageMsg()}</span>
 	<select class="preset-form-input py-1 text-sm" value={getLocale()} onchange={handleChange}>
 		{#each locales as locale (locale)}
-			<option value={locale}>{labels[locale] ?? locale}</option>
+			<option
+				class="bg-surface-50 text-surface-950 dark:bg-surface-800 dark:text-surface-50"
+				value={locale}>{labels[locale] ?? locale}</option
+			>
 		{/each}
 	</select>
 </label>
