@@ -25,11 +25,11 @@
 	<Dialog.Positioner class="fixed inset-0 flex items-center justify-center p-4">
 		<Dialog.Content class="card preset-filled-surface-50-950 w-full max-w-sm space-y-4 p-6">
 			<Dialog.Title class="h3 font-bold">{who_played()}</Dialog.Title>
-			<div class="flex flex-col gap-3">
+			<div class="flex flex-col gap-6">
 				{#each players as player (player)}
 					<button
 						type="button"
-						class="btn preset-outlined-primary-500 min-h-14 w-full text-xl"
+						class="btn preset-outlined-primary-500 min-h-20 w-full text-xl"
 						onclick={() => onSelect(player)}
 					>
 						{player}

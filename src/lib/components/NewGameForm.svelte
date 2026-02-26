@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {
-		new_game,
 		team1_label,
 		team2_label,
 		start_game,
@@ -135,16 +134,14 @@
 <div class="flex min-h-screen items-center justify-center p-4">
 	<form
 		onsubmit={handleSubmit}
-		class="card preset-outlined-surface-500 flex w-full max-w-sm flex-col gap-6 p-6"
+		class="card preset-outlined-surface-500 flex w-full max-w-sm flex-col gap-4 p-6"
 	>
-		<h1 class="h3 text-center font-bold">{new_game()}</h1>
-
 		<div class="flex min-h-12 items-center">
 			<Switch
 				checked={trackPlayers}
 				onCheckedChange={(details) => (trackPlayers = details.checked)}
 			>
-				<Switch.Control>
+				<Switch.Control class="scale-150 origin-left mr-4">
 					<Switch.Thumb />
 				</Switch.Control>
 				<Switch.Label>{track_players()}</Switch.Label>

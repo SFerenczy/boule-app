@@ -13,9 +13,7 @@ describe('Scoring Screen Page', () => {
 	it('shows NewGameForm when no active game exists', async () => {
 		render(Page);
 
-		const heading = await screen.findByRole('heading', { name: /new game/i });
-		expect(heading).toBeInTheDocument();
-		expect(screen.getByRole('button', { name: /start game/i })).toBeInTheDocument();
+		expect(await screen.findByRole('button', { name: /start game/i })).toBeInTheDocument();
 	});
 
 	it('shows ScoringScreen after creating a game', async () => {
@@ -61,7 +59,7 @@ describe('Scoring Screen Page', () => {
 		await completeGame(db, id);
 
 		// liveQuery should react and show the NewGameForm
-		expect(await screen.findByRole('heading', { name: /new game/i })).toBeInTheDocument();
+		expect(await screen.findByRole('button', { name: /start game/i })).toBeInTheDocument();
 	});
 
 	it('updates stats when fail button is tapped', async () => {
@@ -124,7 +122,7 @@ describe('Scoring Screen Page', () => {
 		const confirmButton = await screen.findByRole('button', { name: /end game/i });
 		await user.click(confirmButton);
 
-		expect(await screen.findByRole('heading', { name: /new game/i })).toBeInTheDocument();
+		expect(await screen.findByRole('button', { name: /start game/i })).toBeInTheDocument();
 	});
 
 	it('full flow: create game via form', async () => {
