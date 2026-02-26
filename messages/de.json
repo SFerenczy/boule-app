@@ -1,0 +1,17 @@
+{
+	"app_title": "Boule",
+	"loading": "Laden",
+	"new_game": "Neues Spiel",
+	"team1_label": "Team 1",
+	"team2_label": "Team 2",
+	"start_game": "Spiel starten",
+	"pointing": "Legen",
+	"shooting": "Schießen",
+	"end_game": "Spiel beenden",
+	"end_game_title": "Spiel beenden?",
+	"end_game_description": "Das Spiel wird gespeichert und beendet.",
+	"cancel": "Abbrechen",
+	"success_aria": "{label} Erfolg",
+	"fail_aria": "{label} Fehler",
+	"language": "Sprache"
+}

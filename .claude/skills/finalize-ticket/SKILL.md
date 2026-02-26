@@ -39,12 +39,12 @@ Run after completing a ticket's main work to ensure proper cleanup.
 
 Ask: "What new work did this ticket reveal?"
 
-| Completed ticket type | Often creates                    |
-| --------------------- | -------------------------------- |
-| Decision ticket       | Implementation ticket(s)         |
-| Design/spec           | Implementation ticket(s)         |
-| Implementation        | Testing, documentation tickets   |
-| Any                   | Refactoring ideas, enhancements  |
+| Completed ticket type | Often creates                   |
+| --------------------- | ------------------------------- |
+| Decision ticket       | Implementation ticket(s)        |
+| Design/spec           | Implementation ticket(s)        |
+| Implementation        | Testing, documentation tickets  |
+| Any                   | Refactoring ideas, enhancements |
 
 Create new tickets in `.project/backlog/` with next sequential number.
 

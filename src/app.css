@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton-svelte';
+@import './themes/boule.css';
+
+/* Custom Presets */
+
+/* Team container card — base card style for team sections; TeamCard adds accent + padding */
+.preset-team-card {
+	@apply card preset-outlined-surface-500 overflow-hidden;
+}
+
+/* Large tap targets for recording pointing/shooting outcomes */
+.preset-stat-tap-success {
+	@apply btn preset-filled-success-500 min-h-12 min-w-12 text-lg font-bold;
+}
+
+.preset-stat-tap-fail {
+	@apply btn preset-filled-error-500 min-h-12 min-w-12 text-lg font-bold;
+}
+
+/* Text input for all form fields */
+.preset-form-input {
+	@apply input preset-outlined-surface-500;
+}
+
+/* Full-width primary CTA at the bottom of a screen (Start Game, confirm actions) */
+.preset-page-action {
+	@apply btn btn-lg preset-filled-primary-500 w-full;
+}

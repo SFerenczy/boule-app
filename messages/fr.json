@@ -1,0 +1,17 @@
+{
+	"app_title": "Boule",
+	"loading": "Chargement",
+	"new_game": "Nouvelle partie",
+	"team1_label": "Équipe 1",
+	"team2_label": "Équipe 2",
+	"start_game": "Lancer la partie",
+	"pointing": "Pointage",
+	"shooting": "Tir",
+	"end_game": "Fin de partie",
+	"end_game_title": "Fin de partie ?",
+	"end_game_description": "La partie sera sauvegardée et terminée.",
+	"cancel": "Annuler",
+	"success_aria": "{label} réussi",
+	"fail_aria": "{label} raté",
+	"language": "Langue"
+}

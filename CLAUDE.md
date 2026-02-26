@@ -33,7 +33,7 @@ Component directories get their own `CLAUDE.md` as they're created (e.g. `fronte
 
 ### AI-First Development
 
-This project is built *by* agents, *for* agents. Every convention exists to make the agent feedback loop tight and reliable.
+This project is built _by_ agents, _for_ agents. Every convention exists to make the agent feedback loop tight and reliable.
 
 - **Tight loops.** Every commit must pass checks. If there's no precommit gate, create one before writing features. `just check` (or equivalent) must exist and must be fast.
 - **Strict contracts.** Types are the spec. If the compiler/linter accepts it, it should be correct. Maximize what the type system can enforce.
@@ -64,13 +64,13 @@ Every non-trivial feature follows this pipeline:
 ticket → specs → plan → implement → finalize
 ```
 
-| Artifact     | Purpose                    | Detail                                                         |
-| ------------ | -------------------------- | -------------------------------------------------------------- |
-| **Ticket**   | *What* and *why* (product) | Goal, context, tasks, acceptance criteria                      |
-| **Specs**    | *Exact contracts* (design) | Schemas, API shapes, error cases, edge cases                   |
-| **Plan**     | *Execution order* (impl)   | Files to touch, sequence, how to break into commits            |
-| **Code**     | *Delivery*                 | Production-quality. No stubs, no TODOs, no "fix later"         |
-| **Finalize** | *Cleanup*                  | Derived tickets, doc updates, cross-links. Run `/finalize-ticket` |
+| Artifact     | Purpose                    | Detail                                                            |
+| ------------ | -------------------------- | ----------------------------------------------------------------- |
+| **Ticket**   | _What_ and _why_ (product) | Goal, context, tasks, acceptance criteria                         |
+| **Specs**    | _Exact contracts_ (design) | Schemas, API shapes, error cases, edge cases                      |
+| **Plan**     | _Execution order_ (impl)   | Files to touch, sequence, how to break into commits               |
+| **Code**     | _Delivery_                 | Production-quality. No stubs, no TODOs, no "fix later"            |
+| **Finalize** | _Cleanup_                  | Derived tickets, doc updates, cross-links. Run `/finalize-ticket` |
 
 See [tickets skill](.claude/skills/tickets/SKILL.md) for the full workflow.
 
@@ -98,22 +98,26 @@ Standards that apply regardless of language or component.
 - Commit messages reference ticket numbers when applicable: `[003] Add player model`
 - One logical change per commit
 - Feature branches for non-trivial work, squash-merge to `main`
+- **Run `just check` before every commit.** It runs format-check, lint, typecheck, and tests.
 
 ## Skills Available
 
-| Skill              | When to use                                                     |
-| ------------------ | --------------------------------------------------------------- |
-| `/project`         | Start of session — understand current state                     |
-| `/tickets`         | Before picking up, creating, or modifying tickets               |
+| Skill              | When to use                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| `/project`         | Start of session — understand current state                       |
+| `/tickets`         | Before picking up, creating, or modifying tickets                 |
 | `/finalize-ticket` | After completing a ticket — cleanup, derived tickets, doc updates |
-| `/docs`            | Before creating or editing documentation files                  |
+| `/docs`            | Before creating or editing documentation files                    |
+| `/design-system`   | Before writing any UI — presets, colors, how to extend the system |
 
 ## Quick Reference
 
-| Resource                | Purpose                             |
-| ----------------------- | ----------------------------------- |
-| `.project/backlog/`     | Pending tickets                     |
-| `.project/done/`        | Completed tickets                   |
-| `.project/systems/`     | Component state + improvement ideas |
-| `.project/roadmap.md`   | Product roadmap                     |
-| `.project/decisions.md` | Architectural decisions log         |
+| Resource                            | Purpose                                         |
+| ----------------------------------- | ----------------------------------------------- |
+| `.project/backlog/`                 | Pending tickets                                 |
+| `.project/done/`                    | Completed tickets                               |
+| `.project/systems/`                 | Component state + improvement ideas             |
+| `.project/roadmap.md`               | Product roadmap                                 |
+| `.project/decisions.md`             | Architectural decisions log                     |
+| `DESIGN.md`                         | UI enforcement — lint rules, types, screenshots |
+| `.project/systems/design-system.md` | Visual spec — colors, spacing, components       |

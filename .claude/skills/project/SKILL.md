@@ -13,16 +13,16 @@ A boule/petanque companion app for tracking games, player stats, and match histo
 
 ## Planned Stack
 
-| Layer      | Choice                                | Status   |
-| ---------- | ------------------------------------- | -------- |
-| Frontend   | SvelteKit + adapter-static, Svelte 5  | Decided  |
-| Language   | TypeScript (strict)                   | Decided  |
-| Data       | Dexie.js over IndexedDB (local-first) | Decided  |
-| Styling    | Tailwind CSS v4 + Skeleton UI         | Decided  |
-| PWA        | Service worker + manifest             | Decided  |
-| Deploy     | GitHub Pages                          | Decided  |
-| Tooling    | just, GitHub Actions, prettier+eslint | Decided  |
-| Backend    | Rust/Axum (Phase 5 only, if needed)   | Deferred |
+| Layer    | Choice                                | Status   |
+| -------- | ------------------------------------- | -------- |
+| Frontend | SvelteKit + adapter-static, Svelte 5  | Decided  |
+| Language | TypeScript (strict)                   | Decided  |
+| Data     | Dexie.js over IndexedDB (local-first) | Decided  |
+| Styling  | Tailwind CSS v4 + Skeleton UI         | Decided  |
+| PWA      | Service worker + manifest             | Decided  |
+| Deploy   | GitHub Pages                          | Decided  |
+| Tooling  | just, GitHub Actions, prettier+eslint | Decided  |
+| Backend  | Rust/Axum (Phase 5 only, if needed)   | Deferred |
 
 ## Directory Structure
 

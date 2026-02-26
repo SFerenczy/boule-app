@@ -25,6 +25,7 @@ Files over ~150 lines with 4+ sections should have a flat section index after th
 - Section Three
 
 ## Section One
+
 ...
 ```
 
@@ -33,11 +34,13 @@ No line numbers (they go stale). Agents can `Grep` for the heading text.
 ## When to Split
 
 **Split when:**
+
 - File exceeds ~200 lines
 - Sections serve different audiences
 - You're adding a section unrelated to the file's title
 
 **Keep together when:**
+
 - Sections are tightly coupled
 - Splitting would create files under ~30 lines
 - Cross-references would outnumber the content

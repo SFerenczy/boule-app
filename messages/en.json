@@ -1,0 +1,17 @@
+{
+	"app_title": "Boule",
+	"loading": "Loading",
+	"new_game": "New Game",
+	"team1_label": "Team 1",
+	"team2_label": "Team 2",
+	"start_game": "Start Game",
+	"pointing": "Pointing",
+	"shooting": "Shooting",
+	"end_game": "End Game",
+	"end_game_title": "End Game?",
+	"end_game_description": "This will save and close the current game.",
+	"cancel": "Cancel",
+	"success_aria": "{label} success",
+	"fail_aria": "{label} fail",
+	"language": "Language"
+}

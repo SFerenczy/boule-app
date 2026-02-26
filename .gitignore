@@ -12,8 +12,15 @@
 .DS_Store
 Thumbs.db
 
-# Build outputs (will be refined once tech stack is chosen)
+# Screenshots
+/screenshots/
+
+# Generated code
+src/lib/paraglide/
+
+# Build outputs
 /target/
 /dist/
 /build/
 node_modules/
+.svelte-kit/

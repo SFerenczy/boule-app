@@ -133,3 +133,23 @@ Persistent log of decisions made for the project. Each decision gets a DEC numbe
 - `just` over `make`: cleaner syntax, no tab-sensitivity, better for non-C projects. Over npm scripts: language-agnostic, works if Rust enters later.
 - GitHub Actions: free for public repos, already the platform for GitHub Pages deploys.
 - prettier + eslint: standard SvelteKit tooling. Canonical formatters mean formatting is never a review concern.
+
+---
+
+## DEC-007: Client-Side i18n with Paraglide.js
+
+**Date:** 2026-02-26 | **Status:** Decided
+**Ticket:** 007-i18n
+
+**Context:** The app is used in Germany and France. Need to support English, German, and French. The ticket originally specified URL-based language routing (`/de/`, `/fr/`, `/en/`) with static generation of locale variants.
+
+**Decision:** Client-side only locale switching with Paraglide.js. No URL-based routing.
+
+**Rationale:**
+
+- The app is a single-route SPA with `ssr: false` and all data in IndexedDB. URL prefixes add complexity (enabling SSR, SSR-guarding Dexie, prerendering locale variants) with zero user benefit for a PWA where users don't share URLs.
+- Paraglide.js provides fully typed, tree-shakeable message functions — missing keys break the build.
+- Strategy: `localStorage` → `preferredLanguage` (browser detection) → `baseLocale` (`en`). First visit detects browser language; subsequent visits restore saved preference.
+- Language selector shown on the NewGameForm screen only, hidden during active gameplay.
+
+**Trade-off:** No SEO benefit from locale-prefixed URLs. Acceptable for a PWA with a single route and no public content to index.
