@@ -28,7 +28,7 @@
 	let trackPlayers = $state(false);
 	let teamSize = $state<1 | 2 | 3>(2);
 	let team1Players = $state<readonly string[]>([me()]);
-	let team2Players = $state<readonly string[]>([defaultPlayerName(1), defaultPlayerName(2)]);
+	let team2Players = $state<readonly string[]>([defaultPlayerName(3), defaultPlayerName(4)]);
 
 	const STORAGE_KEY = 'boule-player-settings';
 
@@ -52,7 +52,7 @@
 		teamSize = size;
 		const t1 = ensurePlayerSlots(team1Players, size, 1);
 		team1Players = [me(), ...t1.slice(1)];
-		team2Players = ensurePlayerSlots(team2Players, size, 1);
+		team2Players = ensurePlayerSlots(team2Players, size, size + 1);
 	}
 
 	onMount(() => {
@@ -67,7 +67,7 @@
 					team1Players = [me(), ...loaded.slice(1)];
 				}
 				if (Array.isArray(settings.team2Players)) {
-					team2Players = ensurePlayerSlots(settings.team2Players, teamSize, 1);
+					team2Players = ensurePlayerSlots(settings.team2Players, teamSize, teamSize + 1);
 				}
 			}
 		} catch {
@@ -91,7 +91,9 @@
 			p1 = team1Players
 				.map((p) => p.trim())
 				.map((p, i) => p || (i === 0 ? me() : defaultPlayerName(i + 1)));
-			p2 = team2Players.map((p) => p.trim()).map((p, i) => p || defaultPlayerName(i + 1));
+			p2 = team2Players
+				.map((p) => p.trim())
+				.map((p, i) => p || defaultPlayerName(teamSize + i + 1));
 
 			try {
 				localStorage.setItem(
@@ -209,7 +211,7 @@
 							oninput={(e) => {
 								team2Players = updatePlayer(team2Players, i, e.currentTarget.value);
 							}}
-							placeholder={defaultPlayerName(i + 1)}
+							placeholder={defaultPlayerName(teamSize + i + 1)}
 						/>
 					{/each}
 				</div>
