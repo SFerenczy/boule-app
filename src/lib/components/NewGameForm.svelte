@@ -17,11 +17,11 @@
 <div class="flex min-h-screen items-center justify-center p-4">
 	<form
 		onsubmit={handleSubmit}
-		class="card preset-outlined-surface-500 w-full max-w-sm space-y-4 p-6"
+		class="card preset-outlined-surface-500 flex w-full max-w-sm flex-col gap-6 p-6"
 	>
 		<h1 class="h3 text-center font-bold">{new_game()}</h1>
 
-		<label class="space-y-1">
+		<label class="flex flex-col gap-1">
 			<span class="text-base font-medium">{team1_label()}</span>
 			<input
 				type="text"
@@ -31,7 +31,7 @@
 			/>
 		</label>
 
-		<label class="space-y-1">
+		<label class="flex flex-col gap-1">
 			<span class="text-base font-medium">{team2_label()}</span>
 			<input
 				type="text"
@@ -41,9 +41,9 @@
 			/>
 		</label>
 
-		<button type="submit" class="preset-page-action">{start_game()}</button>
+		<button type="submit" class="preset-page-action mt-2">{start_game()}</button>
 
-		<div class="flex justify-center pt-2">
+		<div class="flex justify-center">
 			<LanguageSelector />
 		</div>
 	</form>
