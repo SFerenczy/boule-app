@@ -2,8 +2,8 @@ import { BoubleDB } from './database';
 export {
 	createGame,
 	getActiveGame,
-	updateStats,
-	decrementStats,
+	recordAction,
+	undoLastAction,
 	completeGame,
 } from './game-repository';
 

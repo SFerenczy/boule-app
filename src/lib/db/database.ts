@@ -10,5 +10,10 @@ export class BoubleDB extends Dexie {
 		this.version(2).stores({
 			games: '++id, status, startedAt',
 		});
+		this.version(3)
+			.stores({
+				games: '++id, status, startedAt',
+			})
+			.upgrade((tx) => tx.table('games').clear());
 	}
 }

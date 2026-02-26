@@ -1,23 +1,19 @@
 import type { BoubleDB } from './database';
-import type { Game, TeamStats } from '$lib/types';
-
-const emptyStats = (): TeamStats => ({
-	pointingSuccess: 0,
-	pointingFail: 0,
-	shootingSuccess: 0,
-	shootingFail: 0,
-});
+import type { Game, HistoryEntry } from '$lib/types';
 
 export const createGame = async (
 	db: BoubleDB,
 	team1Name: string,
 	team2Name: string,
+	team1Players: readonly string[] = ['Anonymous'],
+	team2Players: readonly string[] = ['Anonymous'],
 ): Promise<number> => {
 	const game: Omit<Game, 'id'> = {
 		team1Name,
 		team2Name,
-		team1Stats: emptyStats(),
-		team2Stats: emptyStats(),
+		team1Players,
+		team2Players,
+		history: [],
 		status: 'in-progress',
 		startedAt: new Date(),
 	};
@@ -27,53 +23,24 @@ export const createGame = async (
 export const getActiveGame = (db: BoubleDB): Promise<Game | undefined> =>
 	db.games.where('status').equals('in-progress').first();
 
-export const updateStats = async (
+export const recordAction = async (
 	db: BoubleDB,
 	gameId: number,
-	teamIndex: 0 | 1,
-	category: 'pointing' | 'shooting',
-	type: 'success' | 'fail',
+	entry: Omit<HistoryEntry, 'timestamp'>,
 ): Promise<void> => {
 	const game = await db.games.get(gameId);
 	if (!game) throw new Error(`Game ${gameId} not found`);
 
-	const statsKey = teamIndex === 0 ? 'team1Stats' : 'team2Stats';
-	const statField =
-		category === 'pointing'
-			? type === 'success'
-				? 'pointingSuccess'
-				: 'pointingFail'
-			: type === 'success'
-				? 'shootingSuccess'
-				: 'shootingFail';
-
-	const updated = { ...game[statsKey], [statField]: game[statsKey][statField] + 1 };
-	await db.games.update(gameId, { [statsKey]: updated });
+	const historyEntry: HistoryEntry = { ...entry, timestamp: new Date() };
+	await db.games.update(gameId, { history: [...game.history, historyEntry] });
 };
 
-export const decrementStats = async (
-	db: BoubleDB,
-	gameId: number,
-	teamIndex: 0 | 1,
-	category: 'pointing' | 'shooting',
-	type: 'success' | 'fail',
-): Promise<void> => {
+export const undoLastAction = async (db: BoubleDB, gameId: number): Promise<void> => {
 	const game = await db.games.get(gameId);
 	if (!game) throw new Error(`Game ${gameId} not found`);
+	if (game.history.length === 0) return;
 
-	const statsKey = teamIndex === 0 ? 'team1Stats' : 'team2Stats';
-	const statField =
-		category === 'pointing'
-			? type === 'success'
-				? 'pointingSuccess'
-				: 'pointingFail'
-			: type === 'success'
-				? 'shootingSuccess'
-				: 'shootingFail';
-
-	const current = game[statsKey][statField];
-	const updated = { ...game[statsKey], [statField]: Math.max(0, current - 1) };
-	await db.games.update(gameId, { [statsKey]: updated });
+	await db.games.update(gameId, { history: game.history.slice(0, -1) });
 };
 
 export const completeGame = async (db: BoubleDB, gameId: number): Promise<void> => {

@@ -4,15 +4,14 @@ import { BoubleDB } from './database';
 import {
 	createGame,
 	getActiveGame,
-	updateStats,
-	decrementStats,
+	recordAction,
+	undoLastAction,
 	completeGame,
 } from './game-repository';
 
 let db: BoubleDB;
 
 beforeEach(async () => {
-	// Each test gets a fresh in-memory database via a new IDBFactory instance
 	db = new BoubleDB({ indexedDB: new IDBFactory() });
 	await db.open();
 });
@@ -22,22 +21,10 @@ afterEach(async () => {
 });
 
 describe('createGame', () => {
-	it('initializes all counters to zero', async () => {
+	it('initializes with empty history', async () => {
 		const id = await createGame(db, 'Team A', 'Team B');
 		const game = await db.games.get(id);
-
-		expect(game?.team1Stats).toEqual({
-			pointingSuccess: 0,
-			pointingFail: 0,
-			shootingSuccess: 0,
-			shootingFail: 0,
-		});
-		expect(game?.team2Stats).toEqual({
-			pointingSuccess: 0,
-			pointingFail: 0,
-			shootingSuccess: 0,
-			shootingFail: 0,
-		});
+		expect(game?.history).toEqual([]);
 	});
 
 	it('sets status to in-progress', async () => {
@@ -51,6 +38,20 @@ describe('createGame', () => {
 		const game = await db.games.get(id);
 		expect(game?.team1Name).toBe('Red');
 		expect(game?.team2Name).toBe('Blue');
+	});
+
+	it('defaults players to Anonymous', async () => {
+		const id = await createGame(db, 'Team A', 'Team B');
+		const game = await db.games.get(id);
+		expect(game?.team1Players).toEqual(['Anonymous']);
+		expect(game?.team2Players).toEqual(['Anonymous']);
+	});
+
+	it('accepts custom player lists', async () => {
+		const id = await createGame(db, 'Team A', 'Team B', ['Alice', 'Bob'], ['Charlie']);
+		const game = await db.games.get(id);
+		expect(game?.team1Players).toEqual(['Alice', 'Bob']);
+		expect(game?.team2Players).toEqual(['Charlie']);
 	});
 });
 
@@ -74,86 +75,83 @@ describe('getActiveGame', () => {
 	});
 });
 
-describe('updateStats', () => {
-	it('increments team1 pointing success', async () => {
+describe('recordAction', () => {
+	it('appends entry to history', async () => {
 		const id = await createGame(db, 'Team A', 'Team B');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		const game = await db.games.get(id);
-		expect(game?.team1Stats.pointingSuccess).toBe(1);
-	});
-
-	it('increments team2 shooting fail', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
-		await updateStats(db, id, 1, 'shooting', 'fail');
-		const game = await db.games.get(id);
-		expect(game?.team2Stats.shootingFail).toBe(1);
-	});
-
-	it('does not affect other counters', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		const game = await db.games.get(id);
-		expect(game?.team1Stats.pointingFail).toBe(0);
-		expect(game?.team1Stats.shootingSuccess).toBe(0);
-		expect(game?.team1Stats.shootingFail).toBe(0);
-		expect(game?.team2Stats).toEqual({
-			pointingSuccess: 0,
-			pointingFail: 0,
-			shootingSuccess: 0,
-			shootingFail: 0,
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
 		});
+		const game = await db.games.get(id);
+		expect(game?.history).toHaveLength(1);
+		expect(game?.history[0]?.teamIndex).toBe(0);
+		expect(game?.history[0]?.category).toBe('pointing');
+		expect(game?.history[0]?.type).toBe('success');
+		expect(game?.history[0]?.timestamp).toBeDefined();
 	});
 
-	it('accumulates multiple increments', async () => {
+	it('accumulates multiple entries', async () => {
 		const id = await createGame(db, 'Team A', 'Team B');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'success');
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 1,
+			player: 'Anonymous',
+			category: 'shooting',
+			type: 'fail',
+		});
 		const game = await db.games.get(id);
-		expect(game?.team1Stats.pointingSuccess).toBe(3);
+		expect(game?.history).toHaveLength(2);
 	});
 
 	it('throws for unknown game id', async () => {
-		await expect(updateStats(db, 999, 0, 'pointing', 'success')).rejects.toThrow(
-			'Game 999 not found',
-		);
+		await expect(
+			recordAction(db, 999, {
+				teamIndex: 0,
+				player: 'Anonymous',
+				category: 'pointing',
+				type: 'success',
+			}),
+		).rejects.toThrow('Game 999 not found');
 	});
 });
 
-describe('decrementStats', () => {
-	it('decrements the correct field', async () => {
+describe('undoLastAction', () => {
+	it('removes last entry from history', async () => {
 		const id = await createGame(db, 'Team A', 'Team B');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await decrementStats(db, id, 0, 'pointing', 'success');
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 1,
+			player: 'Anonymous',
+			category: 'shooting',
+			type: 'fail',
+		});
+		await undoLastAction(db, id);
 		const game = await db.games.get(id);
-		expect(game?.team1Stats.pointingSuccess).toBe(1);
+		expect(game?.history).toHaveLength(1);
+		expect(game?.history[0]?.teamIndex).toBe(0);
 	});
 
-	it('floors at zero (no negative stats)', async () => {
+	it('does nothing on empty history', async () => {
 		const id = await createGame(db, 'Team A', 'Team B');
-		await decrementStats(db, id, 0, 'pointing', 'success');
+		await undoLastAction(db, id);
 		const game = await db.games.get(id);
-		expect(game?.team1Stats.pointingSuccess).toBe(0);
-	});
-
-	it('does not affect other counters', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
-		await updateStats(db, id, 0, 'pointing', 'success');
-		await updateStats(db, id, 0, 'pointing', 'fail');
-		await updateStats(db, id, 0, 'shooting', 'success');
-		await decrementStats(db, id, 0, 'pointing', 'success');
-		const game = await db.games.get(id);
-		expect(game?.team1Stats.pointingSuccess).toBe(0);
-		expect(game?.team1Stats.pointingFail).toBe(1);
-		expect(game?.team1Stats.shootingSuccess).toBe(1);
-		expect(game?.team1Stats.shootingFail).toBe(0);
+		expect(game?.history).toEqual([]);
 	});
 
 	it('throws for unknown game id', async () => {
-		await expect(decrementStats(db, 999, 0, 'pointing', 'success')).rejects.toThrow(
-			'Game 999 not found',
-		);
+		await expect(undoLastAction(db, 999)).rejects.toThrow('Game 999 not found');
 	});
 });
 
@@ -182,7 +180,6 @@ describe('Active game constraint', () => {
 		await createGame(db, 'Team A', 'Team B');
 		await createGame(db, 'Team C', 'Team D');
 		const active = await getActiveGame(db);
-		// getActiveGame returns the first match — only one should be used at a time
 		expect(active?.team1Name).toBe('Team A');
 	});
 });
