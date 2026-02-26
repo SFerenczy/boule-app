@@ -3,6 +3,7 @@
 # Install all dependencies and generate artifacts
 setup:
     pnpm install
+    pnpm exec paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy localStorage preferredLanguage baseLocale --silent
     pnpm exec svelte-kit sync
 
 # Start dev server
