@@ -31,6 +31,19 @@ Component directories get their own `CLAUDE.md` as they're created (e.g. `fronte
 
 ## Philosophy
 
+### User-First UX
+
+The primary user is someone mid-game on a boule field — possibly older, not particularly tech-savvy, standing in sunlight with dirty hands. Every UX decision flows from this:
+
+- **Big touch targets.** Buttons must be large and easy to hit without precision. Minimum 48px, prefer larger for primary actions.
+- **No fiddly interactions.** No small toggles, no drag-and-drop, no long-press menus. Tap and done.
+- **Obvious flow.** The user should never wonder "what do I tap next?" Every screen has one clear primary action.
+- **Fast in, fast out.** Starting a game or logging a score should take seconds, not minutes. Minimize setup steps, maximize defaults.
+- **Readability outdoors.** Large text, high contrast, no thin fonts. Designed for sunlight on a phone screen.
+- **Forgiving.** Easy to undo, hard to break. Accidental taps shouldn't cause data loss.
+
+If a feature makes the app harder to use for a 60-year-old on a field, it's wrong — no matter how clever it is.
+
 ### AI-First Development
 
 This project is built _by_ agents, _for_ agents. Every convention exists to make the agent feedback loop tight and reliable.

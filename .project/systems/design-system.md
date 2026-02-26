@@ -14,6 +14,8 @@ For working rules and the preset inventory, load the `/design-system` skill. Thi
 
 **Design brief:** Used outdoors on a boule field — often by non-tech-savvy players mid-round, in bright sunlight, sometimes with dirty or wet hands. The primary interaction is a quick tap to log a result. The app earns trust through clarity and speed, not aesthetics. Warmth comes from color and copy, not from decorative UI.
 
+**Core UX constraint:** The app must be comfortably usable by older, non-tech-savvy players. Big buttons, obvious flow, no fiddly interactions. If your dad can't figure it out mid-game without instructions, the design is wrong. See `CLAUDE.md > Philosophy > User-First UX` for the full principle.
+
 ---
 
 ## Visual Language
