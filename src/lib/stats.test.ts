@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import type { HistoryEntry } from '$lib/types';
 import type { Round } from '$lib/types';
-import { deriveTeamStats, derivePlayerStats, deriveTotals, deriveScore, deriveRoundHistory } from '$lib/stats';
+import {
+	deriveTeamStats,
+	derivePlayerStats,
+	deriveTotals,
+	deriveScore,
+	deriveRoundHistory,
+} from '$lib/stats';
 
 const entry = (
 	overrides: Partial<HistoryEntry> & Pick<HistoryEntry, 'teamIndex' | 'category' | 'type'>,

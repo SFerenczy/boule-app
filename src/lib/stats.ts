@@ -50,12 +50,10 @@ export const deriveTotals = (stats: DerivedStats): DerivedTotals => {
 	return { totalSuccesses, totalAttempts, percentage };
 };
 
-export const deriveScore = (rounds: readonly Round[]): [number, number] =>
-	rounds.reduce<[number, number]>(
-		(acc, r) => {
-			acc[r.scoringTeamIndex] += r.points;
-			return acc;
-		},
+export const deriveScore = (rounds: readonly Round[]): readonly [number, number] =>
+	rounds.reduce<readonly [number, number]>(
+		(acc, r) =>
+			r.scoringTeamIndex === 0 ? [acc[0] + r.points, acc[1]] : [acc[0], acc[1] + r.points],
 		[0, 0],
 	);
 
@@ -69,7 +67,7 @@ export const deriveRoundHistory = (
 	rounds: readonly Round[],
 	team1Name: string,
 	team2Name: string,
-): RoundHistoryEntry[] =>
+): readonly RoundHistoryEntry[] =>
 	rounds.map((r, i) => ({
 		roundNumber: i + 1,
 		teamName: r.scoringTeamIndex === 0 ? team1Name : team2Name,

@@ -21,8 +21,11 @@ describe('Scoring Screen Page', () => {
 
 		render(Page);
 
-		expect(await screen.findByText('Alpha')).toBeInTheDocument();
-		expect(screen.getByText('Beta')).toBeInTheDocument();
+		// Team names appear in multiple places (header, cards, modal) — use getAllByText
+		const alphaElements = await screen.findAllByText('Alpha');
+		expect(alphaElements.length).toBeGreaterThanOrEqual(1);
+		const betaElements = screen.getAllByText('Beta');
+		expect(betaElements.length).toBeGreaterThanOrEqual(1);
 	});
 
 	it('shows stat rows for both teams', async () => {
@@ -30,7 +33,7 @@ describe('Scoring Screen Page', () => {
 
 		render(Page);
 
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 		const pointingLabels = screen.getAllByText('Pointing');
 		expect(pointingLabels).toHaveLength(2);
 	});
@@ -39,7 +42,7 @@ describe('Scoring Screen Page', () => {
 		await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		const user = userEvent.setup();
 		const successButtons = screen.getAllByRole('button', { name: /success/i });
@@ -53,7 +56,7 @@ describe('Scoring Screen Page', () => {
 		const id = await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		// Complete the game directly via the repository
 		await completeGame(db, id);
@@ -66,7 +69,7 @@ describe('Scoring Screen Page', () => {
 		await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		const user = userEvent.setup();
 		const failButtons = screen.getAllByRole('button', { name: /fail/i });
@@ -100,17 +103,17 @@ describe('Scoring Screen Page', () => {
 		});
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		expect(screen.getByText('67%')).toBeInTheDocument();
 		expect(screen.getByText('2/3')).toBeInTheDocument();
 	});
 
-	it('end game button with confirm returns to NewGameForm', async () => {
+	it('end game button with confirm shows game over screen', async () => {
 		await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		const user = userEvent.setup();
 
@@ -122,6 +125,12 @@ describe('Scoring Screen Page', () => {
 		const confirmButton = await screen.findByRole('button', { name: /end game/i });
 		await user.click(confirmButton);
 
+		// Should show game over screen with New Game button
+		expect(await screen.findByText(/game over/i)).toBeInTheDocument();
+		const newGameButton = screen.getByRole('button', { name: /new game/i });
+
+		// Click New Game to get to NewGameForm
+		await user.click(newGameButton);
 		expect(await screen.findByRole('button', { name: /start game/i })).toBeInTheDocument();
 	});
 
@@ -134,8 +143,10 @@ describe('Scoring Screen Page', () => {
 		await user.click(startButton);
 
 		// Should now show scoring screen with default team names (We/They)
-		expect(await screen.findByText('We')).toBeInTheDocument();
-		expect(screen.getByText('They')).toBeInTheDocument();
+		const weElements = await screen.findAllByText('We');
+		expect(weElements.length).toBeGreaterThanOrEqual(1);
+		const theyElements = screen.getAllByText('They');
+		expect(theyElements.length).toBeGreaterThanOrEqual(1);
 
 		// Verify the game was persisted
 		const active = await getActiveGame(db);
@@ -148,7 +159,7 @@ describe('Undo functionality', () => {
 		await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		const user = userEvent.setup();
 		const successButtons = screen.getAllByRole('button', { name: /success/i });
@@ -170,7 +181,7 @@ describe('Undo functionality', () => {
 		await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		const undoButton = screen.getByRole('button', { name: /undo/i });
 		expect(undoButton).toBeDisabled();
@@ -208,7 +219,7 @@ describe('Per-team success summary', () => {
 		});
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		// The team summary should show 75% (3/4)
 		expect(screen.getByText('75% (3/4)')).toBeInTheDocument();
@@ -218,7 +229,7 @@ describe('Per-team success summary', () => {
 		await createGame(db, 'Team A', 'Team B');
 
 		render(Page);
-		await screen.findByText('Team A');
+		await screen.findAllByText('Team A');
 
 		// Both summaries should show "–" (en-dash)
 		const summaryLabels = screen.getAllByText('Success');
