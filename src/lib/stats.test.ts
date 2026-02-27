@@ -7,6 +7,8 @@ const entry = (
 ): HistoryEntry => ({
 	player: 'Anonymous',
 	timestamp: new Date(),
+	round: 1,
+	throwIndex: 1,
 	...overrides,
 });
 

@@ -14,6 +14,8 @@ export const createGame = async (
 		team1Players,
 		team2Players,
 		history: [],
+		rounds: [],
+		targetScore: 13,
 		status: 'in-progress',
 		startedAt: new Date(),
 	};
@@ -26,12 +28,19 @@ export const getActiveGame = (db: BoubleDB): Promise<Game | undefined> =>
 export const recordAction = async (
 	db: BoubleDB,
 	gameId: number,
-	entry: Omit<HistoryEntry, 'timestamp'>,
+	entry: Omit<HistoryEntry, 'timestamp' | 'round' | 'throwIndex'>,
 ): Promise<void> => {
 	const game = await db.games.get(gameId);
 	if (!game) throw new Error(`Game ${gameId} not found`);
 
-	const historyEntry: HistoryEntry = { ...entry, timestamp: new Date() };
+	const currentRound = game.rounds.length + 1;
+	const throwIndex = game.history.filter((e) => e.round === currentRound).length + 1;
+	const historyEntry: HistoryEntry = {
+		...entry,
+		timestamp: new Date(),
+		round: currentRound,
+		throwIndex,
+	};
 	await db.games.update(gameId, { history: [...game.history, historyEntry] });
 };
 
