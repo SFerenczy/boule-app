@@ -7,6 +7,7 @@ import {
 	recordAction,
 	undoLastAction,
 	completeGame,
+	recordRound,
 } from './game-repository';
 
 let db: BoubleDB;
@@ -181,5 +182,101 @@ describe('Active game constraint', () => {
 		await createGame(db, 'Team C', 'Team D');
 		const active = await getActiveGame(db);
 		expect(active?.team1Name).toBe('Team A');
+	});
+});
+
+describe('recordRound', () => {
+	it('appends round correctly', async () => {
+		const id = await createGame(db, 'Team A', 'Team B', ['Alice', 'Bob'], ['Charlie', 'Dave']);
+		await recordRound(db, id, 0, 3);
+		const game = await db.games.get(id);
+		expect(game?.rounds).toHaveLength(1);
+		expect(game?.rounds[0]?.scoringTeamIndex).toBe(0);
+		expect(game?.rounds[0]?.points).toBe(3);
+		expect(game?.rounds[0]?.timestamp).toBeDefined();
+	});
+
+	it('sets expectedThrows to 6 for 1v1', async () => {
+		const id = await createGame(db, 'A', 'B', ['Alice'], ['Bob']);
+		await recordRound(db, id, 0, 1);
+		const game = await db.games.get(id);
+		expect(game?.rounds[0]?.expectedThrows).toBe(6);
+	});
+
+	it('sets expectedThrows to 12 for 2v2', async () => {
+		const id = await createGame(db, 'A', 'B', ['A1', 'A2'], ['B1', 'B2']);
+		await recordRound(db, id, 0, 1);
+		const game = await db.games.get(id);
+		expect(game?.rounds[0]?.expectedThrows).toBe(12);
+	});
+
+	it('sets expectedThrows to 12 for 3v3', async () => {
+		const id = await createGame(db, 'A', 'B', ['A1', 'A2', 'A3'], ['B1', 'B2', 'B3']);
+		await recordRound(db, id, 0, 1);
+		const game = await db.games.get(id);
+		expect(game?.rounds[0]?.expectedThrows).toBe(12);
+	});
+
+	it('auto-completes at target score', async () => {
+		const id = await createGame(db, 'A', 'B');
+		await recordRound(db, id, 0, 13);
+		const game = await db.games.get(id);
+		expect(game?.status).toBe('completed');
+		expect(game?.endedAt).toBeDefined();
+	});
+
+	it('stays in-progress below target', async () => {
+		const id = await createGame(db, 'A', 'B');
+		await recordRound(db, id, 0, 6);
+		const game = await db.games.get(id);
+		expect(game?.status).toBe('in-progress');
+		expect(game?.endedAt).toBeUndefined();
+	});
+
+	it('throws for unknown game id', async () => {
+		await expect(recordRound(db, 999, 0, 1)).rejects.toThrow('Game 999 not found');
+	});
+});
+
+describe('recordAction round/throwIndex', () => {
+	it('stamps round and throwIndex on throws', async () => {
+		const id = await createGame(db, 'A', 'B');
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordAction(db, id, {
+			teamIndex: 1,
+			player: 'Anonymous',
+			category: 'shooting',
+			type: 'fail',
+		});
+		const game = await db.games.get(id);
+		expect(game?.history[0]?.round).toBe(1);
+		expect(game?.history[0]?.throwIndex).toBe(1);
+		expect(game?.history[1]?.round).toBe(1);
+		expect(game?.history[1]?.throwIndex).toBe(2);
+	});
+
+	it('resets throwIndex after round scored', async () => {
+		const id = await createGame(db, 'A', 'B');
+		await recordAction(db, id, {
+			teamIndex: 0,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		await recordRound(db, id, 0, 1);
+		await recordAction(db, id, {
+			teamIndex: 1,
+			player: 'Anonymous',
+			category: 'pointing',
+			type: 'success',
+		});
+		const game = await db.games.get(id);
+		expect(game?.history[1]?.round).toBe(2);
+		expect(game?.history[1]?.throwIndex).toBe(1);
 	});
 });

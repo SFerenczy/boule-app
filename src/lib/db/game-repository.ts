@@ -1,5 +1,5 @@
 import type { BoubleDB } from './database';
-import type { Game, HistoryEntry } from '$lib/types';
+import type { Game, HistoryEntry, Round } from '$lib/types';
 
 export const createGame = async (
 	db: BoubleDB,
@@ -54,4 +54,40 @@ export const undoLastAction = async (db: BoubleDB, gameId: number): Promise<void
 
 export const completeGame = async (db: BoubleDB, gameId: number): Promise<void> => {
 	await db.games.update(gameId, { status: 'completed', endedAt: new Date() });
+};
+
+const computeScore = (rounds: readonly Round[]): [number, number] =>
+	rounds.reduce<[number, number]>(
+		(acc, r) => {
+			acc[r.scoringTeamIndex] += r.points;
+			return acc;
+		},
+		[0, 0],
+	);
+
+export const recordRound = async (
+	db: BoubleDB,
+	gameId: number,
+	scoringTeamIndex: 0 | 1,
+	points: number,
+): Promise<void> => {
+	const game = await db.games.get(gameId);
+	if (!game) throw new Error(`Game ${gameId} not found`);
+
+	const boulesPerPlayer = (playerCount: number) => (playerCount <= 2 ? 3 : 2);
+	const expectedThrows =
+		game.team1Players.length * boulesPerPlayer(game.team1Players.length) +
+		game.team2Players.length * boulesPerPlayer(game.team2Players.length);
+
+	const round: Round = { scoringTeamIndex, points, expectedThrows, timestamp: new Date() };
+	const newRounds = [...game.rounds, round];
+	const score = computeScore(newRounds);
+
+	const updates: Partial<Game> = { rounds: newRounds };
+	if (score[scoringTeamIndex] >= game.targetScore) {
+		updates.status = 'completed';
+		updates.endedAt = new Date();
+	}
+
+	await db.games.update(gameId, updates);
 };

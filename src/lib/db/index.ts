@@ -5,6 +5,7 @@ export {
 	recordAction,
 	undoLastAction,
 	completeGame,
+	recordRound,
 } from './game-repository';
 
 export const db = new BoubleDB();
