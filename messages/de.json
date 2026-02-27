@@ -21,5 +21,13 @@
 	"player_name": "Spieler {number}",
 	"me": "Ich",
 	"who_played": "Wer hat gespielt?",
-	"anonymous": "Anonym"
+	"anonymous": "Anonym",
+	"round": "Runde {number}",
+	"score_round": "Runde werten",
+	"game_over": "Spiel beendet",
+	"round_history_entry": "R{number}: {team} +{points}",
+	"round_history": "Rundenverlauf",
+	"select_team": "Welches Team hat gepunktet?",
+	"select_points": "Wie viele Punkte?",
+	"final_score": "Endergebnis"
 }

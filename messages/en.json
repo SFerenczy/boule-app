@@ -21,5 +21,13 @@
 	"player_name": "Player {number}",
 	"me": "Me",
 	"who_played": "Who played?",
-	"anonymous": "Anonymous"
+	"anonymous": "Anonymous",
+	"round": "Round {number}",
+	"score_round": "Score Round",
+	"game_over": "Game Over",
+	"round_history_entry": "R{number}: {team} +{points}",
+	"round_history": "Round History",
+	"select_team": "Which team scored?",
+	"select_points": "How many points?",
+	"final_score": "Final Score"
 }

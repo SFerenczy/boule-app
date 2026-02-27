@@ -21,5 +21,13 @@
 	"player_name": "Joueur {number}",
 	"me": "Moi",
 	"who_played": "Qui a joué ?",
-	"anonymous": "Anonyme"
+	"anonymous": "Anonyme",
+	"round": "Manche {number}",
+	"score_round": "Manche werten",
+	"game_over": "Partie terminée",
+	"round_history_entry": "M{number}: {team} +{points}",
+	"round_history": "Historique des manches",
+	"select_team": "Quelle équipe a marqué ?",
+	"select_points": "Combien de points ?",
+	"final_score": "Score final"
 }
