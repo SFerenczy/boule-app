@@ -1,4 +1,4 @@
-import type { HistoryEntry } from '$lib/types';
+import type { HistoryEntry, Round } from '$lib/types';
 
 export interface DerivedStats {
 	readonly pointingSuccess: number;
@@ -49,3 +49,29 @@ export const deriveTotals = (stats: DerivedStats): DerivedTotals => {
 		totalAttempts === 0 ? null : Math.round((totalSuccesses / totalAttempts) * 100);
 	return { totalSuccesses, totalAttempts, percentage };
 };
+
+export const deriveScore = (rounds: readonly Round[]): [number, number] =>
+	rounds.reduce<[number, number]>(
+		(acc, r) => {
+			acc[r.scoringTeamIndex] += r.points;
+			return acc;
+		},
+		[0, 0],
+	);
+
+export interface RoundHistoryEntry {
+	readonly roundNumber: number;
+	readonly teamName: string;
+	readonly points: number;
+}
+
+export const deriveRoundHistory = (
+	rounds: readonly Round[],
+	team1Name: string,
+	team2Name: string,
+): RoundHistoryEntry[] =>
+	rounds.map((r, i) => ({
+		roundNumber: i + 1,
+		teamName: r.scoringTeamIndex === 0 ? team1Name : team2Name,
+		points: r.points,
+	}));

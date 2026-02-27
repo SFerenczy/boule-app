@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { HistoryEntry } from '$lib/types';
-import { deriveTeamStats, derivePlayerStats, deriveTotals } from '$lib/stats';
+import type { Round } from '$lib/types';
+import { deriveTeamStats, derivePlayerStats, deriveTotals, deriveScore, deriveRoundHistory } from '$lib/stats';
 
 const entry = (
 	overrides: Partial<HistoryEntry> & Pick<HistoryEntry, 'teamIndex' | 'category' | 'type'>,
@@ -117,5 +118,37 @@ describe('deriveTotals', () => {
 			shootingFail: 0,
 		});
 		expect(totals).toEqual({ totalSuccesses: 1, totalAttempts: 3, percentage: 33 });
+	});
+});
+
+const round = (scoringTeamIndex: 0 | 1, points: number): Round => ({
+	scoringTeamIndex,
+	points,
+	expectedThrows: 12,
+	timestamp: new Date(),
+});
+
+describe('deriveScore', () => {
+	it('returns [0, 0] for empty rounds', () => {
+		expect(deriveScore([])).toEqual([0, 0]);
+	});
+
+	it('sums points per team', () => {
+		const rounds = [round(0, 3), round(1, 1), round(0, 2)];
+		expect(deriveScore(rounds)).toEqual([5, 1]);
+	});
+});
+
+describe('deriveRoundHistory', () => {
+	it('returns empty array for no rounds', () => {
+		expect(deriveRoundHistory([], 'We', 'They')).toEqual([]);
+	});
+
+	it('maps rounds to history entries with team names', () => {
+		const rounds = [round(0, 3), round(1, 2)];
+		expect(deriveRoundHistory(rounds, 'We', 'They')).toEqual([
+			{ roundNumber: 1, teamName: 'We', points: 3 },
+			{ roundNumber: 2, teamName: 'They', points: 2 },
+		]);
 	});
 });
