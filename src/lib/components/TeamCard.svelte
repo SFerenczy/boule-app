@@ -22,7 +22,7 @@
 </script>
 
 <section class={`space-y-2 border-l-4 pl-4 ${accentClass}`}>
-	<h2 class="h2 font-semibold">{teamName}</h2>
+	<h2 class="text-base font-semibold">{teamName}</h2>
 	<div class="preset-stat-row">
 		<StatRow
 			label={pointing()}

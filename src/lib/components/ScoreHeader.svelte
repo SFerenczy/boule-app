@@ -14,11 +14,13 @@
 	} = $props();
 </script>
 
-<header class="bg-surface-50-950 sticky top-0 z-10 px-4 py-3 text-center">
-	<div class="text-2xl font-bold">
+<header class="bg-surface-50-950 sticky top-0 z-10 px-4 py-2 text-center">
+	<div class="text-lg font-bold">
 		{team1Name}
-		<span class="text-primary-500 mx-2">{score[0]} – {score[1]}</span>
+		<span class="text-primary-500 mx-1">{score[0]} – {score[1]}</span>
 		{team2Name}
+		<span class="text-surface-500 ml-2 text-xs font-normal"
+			>{roundMsg({ number: String(roundNumber) })}</span
+		>
 	</div>
-	<div class="text-surface-500 text-sm">{roundMsg({ number: String(roundNumber) })}</div>
 </header>

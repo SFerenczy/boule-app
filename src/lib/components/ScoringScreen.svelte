@@ -98,7 +98,7 @@
 			onUpdate={(category, type) => handleStatTap(0, category, type)}
 		/>
 
-		<hr class="my-4" />
+		<hr class="my-3" />
 
 		<TeamCard
 			teamName={game.team2Name}
@@ -110,31 +110,33 @@
 		<RoundHistory entries={roundHistory} />
 	</div>
 
-	<div class="mt-auto flex gap-4 p-4 pt-2">
-		{#if onUndo}
-			<button
-				type="button"
-				class="btn preset-outlined-surface-500 flex-1"
-				disabled={!canUndo}
-				onclick={onUndo}
-			>
-				{undo()}
-			</button>
-		{/if}
+	<div class="mt-auto flex flex-col gap-2 p-4 pt-2">
 		<button
 			type="button"
-			class="btn preset-filled-primary-500 flex-1"
+			class="btn preset-filled-primary-500 w-full"
 			onclick={() => (roundModalOpen = true)}
 		>
 			{score_round()}
 		</button>
-		<button
-			type="button"
-			class="btn preset-outlined-error-500 flex-1"
-			onclick={() => (confirmOpen = true)}
-		>
-			{end_game()}
-		</button>
+		<div class="flex gap-2">
+			{#if onUndo}
+				<button
+					type="button"
+					class="btn btn-sm preset-outlined-surface-500 flex-1"
+					disabled={!canUndo}
+					onclick={onUndo}
+				>
+					{undo()}
+				</button>
+			{/if}
+			<button
+				type="button"
+				class="btn btn-sm preset-outlined-error-500 flex-1"
+				onclick={() => (confirmOpen = true)}
+			>
+				{end_game()}
+			</button>
+		</div>
 	</div>
 </div>
 
