@@ -29,5 +29,6 @@
 	"round_history": "Historique des manches",
 	"select_team": "Quelle équipe a marqué ?",
 	"select_points": "Combien de points ?",
-	"final_score": "Score final"
+	"final_score": "Score final",
+	"throws_progress": "{thrown}/{expected}"
 }

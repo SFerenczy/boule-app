@@ -29,5 +29,6 @@
 	"round_history": "Rundenverlauf",
 	"select_team": "Welches Team hat gepunktet?",
 	"select_points": "Wie viele Punkte?",
-	"final_score": "Endergebnis"
+	"final_score": "Endergebnis",
+	"throws_progress": "{thrown}/{expected}"
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Game } from '$lib/types';
 	import type { RoundHistoryEntry } from '$lib/stats';
+	import { deriveRoundProgress } from '$lib/stats';
 	import TeamCard from './TeamCard.svelte';
 	import ScoreHeader from './ScoreHeader.svelte';
 	import RoundHistory from './RoundHistory.svelte';
@@ -88,13 +89,28 @@
 		onScoreRound(teamIndex, points);
 	}
 
+	const roundProgress = $derived(
+		trackingEnabled
+			? deriveRoundProgress(
+					game.history,
+					roundNumber,
+					game.team1Players.length,
+					game.team2Players.length,
+				)
+			: undefined,
+	);
+
 	const modalPlayers = $derived(
 		pendingAction ? (pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players) : [],
 	);
 </script>
 
 <div class="flex min-h-screen flex-col">
-	<ScoreHeader team1Name={game.team1Name} team2Name={game.team2Name} {score} {roundNumber} />
+	{#if roundProgress}
+		<ScoreHeader team1Name={game.team1Name} team2Name={game.team2Name} {score} {roundNumber} {roundProgress} />
+	{:else}
+		<ScoreHeader team1Name={game.team1Name} team2Name={game.team2Name} {score} {roundNumber} />
+	{/if}
 
 	<div class="flex flex-col p-4">
 		<TeamCard
