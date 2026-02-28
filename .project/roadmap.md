@@ -49,6 +49,7 @@ Track games over time. See how you develop.
 - Per-player stats across games (win rate, Legen/Schießen percentages, trends)
 - Simple player profiles (name, games played, stats)
 - Trend visualization (improving/declining over time)
+- See [visualization research](research/visualization.md) for charting library evaluation and ideas
 
 **Dependencies:** Phase 2 complete
 
