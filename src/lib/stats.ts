@@ -57,6 +57,43 @@ export const deriveScore = (rounds: readonly Round[]): readonly [number, number]
 		[0, 0],
 	);
 
+export const boulesPerPlayer = (playerCount: number): number => (playerCount <= 2 ? 3 : 2);
+
+export interface RoundProgress {
+	readonly thrown: number;
+	readonly expected: number;
+}
+
+export const deriveRoundProgress = (
+	history: readonly HistoryEntry[],
+	roundNumber: number,
+	team1PlayerCount: number,
+	team2PlayerCount: number,
+): RoundProgress => {
+	const thrown = history.filter((e) => e.round === roundNumber).length;
+	const expected =
+		team1PlayerCount * boulesPerPlayer(team1PlayerCount) +
+		team2PlayerCount * boulesPerPlayer(team2PlayerCount);
+	return { thrown, expected };
+};
+
+export const deriveTeamRoundProgress = (
+	history: readonly HistoryEntry[],
+	roundNumber: number,
+	teamIndex: 0 | 1,
+	playerCount: number,
+): RoundProgress => {
+	const thrown = history.filter((e) => e.round === roundNumber && e.teamIndex === teamIndex).length;
+	const expected = playerCount * boulesPerPlayer(playerCount);
+	return { thrown, expected };
+};
+
+export const derivePlayerRoundThrows = (
+	history: readonly HistoryEntry[],
+	roundNumber: number,
+	player: string,
+): number => history.filter((e) => e.round === roundNumber && e.player === player).length;
+
 export interface RoundHistoryEntry {
 	readonly roundNumber: number;
 	readonly teamName: string;

@@ -7,6 +7,10 @@ import {
 	deriveTotals,
 	deriveScore,
 	deriveRoundHistory,
+	boulesPerPlayer,
+	deriveRoundProgress,
+	deriveTeamRoundProgress,
+	derivePlayerRoundThrows,
 } from '$lib/stats';
 
 const entry = (
@@ -124,6 +128,98 @@ describe('deriveTotals', () => {
 			shootingFail: 0,
 		});
 		expect(totals).toEqual({ totalSuccesses: 1, totalAttempts: 3, percentage: 33 });
+	});
+});
+
+describe('boulesPerPlayer', () => {
+	it('returns 3 for 1-player teams', () => {
+		expect(boulesPerPlayer(1)).toBe(3);
+	});
+
+	it('returns 3 for 2-player teams', () => {
+		expect(boulesPerPlayer(2)).toBe(3);
+	});
+
+	it('returns 2 for 3-player teams', () => {
+		expect(boulesPerPlayer(3)).toBe(2);
+	});
+});
+
+describe('deriveRoundProgress', () => {
+	it('returns zero thrown for empty history', () => {
+		expect(deriveRoundProgress([], 1, 2, 2)).toEqual({ thrown: 0, expected: 12 });
+	});
+
+	it('counts throws in the current round only', () => {
+		const history = [
+			entry({ teamIndex: 0, category: 'pointing', type: 'success', round: 1, throwIndex: 1 }),
+			entry({ teamIndex: 1, category: 'pointing', type: 'success', round: 1, throwIndex: 2 }),
+			entry({ teamIndex: 0, category: 'pointing', type: 'success', round: 2, throwIndex: 1 }),
+		];
+		expect(deriveRoundProgress(history, 1, 2, 2)).toEqual({ thrown: 2, expected: 12 });
+	});
+
+	it('computes expected for mixed team sizes', () => {
+		// 1v3: 1*3 + 3*2 = 9
+		expect(deriveRoundProgress([], 1, 1, 3)).toEqual({ thrown: 0, expected: 9 });
+	});
+});
+
+describe('deriveTeamRoundProgress', () => {
+	it('counts only throws for the specified team', () => {
+		const history = [
+			entry({ teamIndex: 0, category: 'pointing', type: 'success', round: 1, throwIndex: 1 }),
+			entry({ teamIndex: 1, category: 'pointing', type: 'success', round: 1, throwIndex: 2 }),
+			entry({ teamIndex: 0, category: 'shooting', type: 'fail', round: 1, throwIndex: 3 }),
+		];
+		expect(deriveTeamRoundProgress(history, 1, 0, 2)).toEqual({ thrown: 2, expected: 6 });
+		expect(deriveTeamRoundProgress(history, 1, 1, 2)).toEqual({ thrown: 1, expected: 6 });
+	});
+});
+
+describe('derivePlayerRoundThrows', () => {
+	it('returns 0 for a player with no throws', () => {
+		expect(derivePlayerRoundThrows([], 1, 'Alice')).toBe(0);
+	});
+
+	it('counts throws for a specific player in a specific round', () => {
+		const history = [
+			entry({
+				teamIndex: 0,
+				player: 'Alice',
+				category: 'pointing',
+				type: 'success',
+				round: 1,
+				throwIndex: 1,
+			}),
+			entry({
+				teamIndex: 0,
+				player: 'Bob',
+				category: 'pointing',
+				type: 'success',
+				round: 1,
+				throwIndex: 2,
+			}),
+			entry({
+				teamIndex: 0,
+				player: 'Alice',
+				category: 'shooting',
+				type: 'fail',
+				round: 1,
+				throwIndex: 3,
+			}),
+			entry({
+				teamIndex: 0,
+				player: 'Alice',
+				category: 'pointing',
+				type: 'success',
+				round: 2,
+				throwIndex: 1,
+			}),
+		];
+		expect(derivePlayerRoundThrows(history, 1, 'Alice')).toBe(2);
+		expect(derivePlayerRoundThrows(history, 1, 'Bob')).toBe(1);
+		expect(derivePlayerRoundThrows(history, 2, 'Alice')).toBe(1);
 	});
 });
 

@@ -1,5 +1,6 @@
 import type { BoubleDB } from './database';
 import type { Game, HistoryEntry, Round } from '$lib/types';
+import { boulesPerPlayer } from '$lib/stats';
 
 export const createGame = async (
 	db: BoubleDB,
@@ -55,8 +56,6 @@ export const undoLastAction = async (db: BoubleDB, gameId: number): Promise<void
 export const completeGame = async (db: BoubleDB, gameId: number): Promise<void> => {
 	await db.games.update(gameId, { status: 'completed', endedAt: new Date() });
 };
-
-const boulesPerPlayer = (playerCount: number): number => (playerCount <= 2 ? 3 : 2);
 
 export const recordRound = async (
 	db: BoubleDB,
