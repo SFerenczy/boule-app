@@ -56,13 +56,6 @@ export const completeGame = async (db: BoubleDB, gameId: number): Promise<void> 
 	await db.games.update(gameId, { status: 'completed', endedAt: new Date() });
 };
 
-const computeScore = (rounds: readonly Round[]): readonly [number, number] =>
-	rounds.reduce<readonly [number, number]>(
-		(acc, r) =>
-			r.scoringTeamIndex === 0 ? [acc[0] + r.points, acc[1]] : [acc[0], acc[1] + r.points],
-		[0, 0],
-	);
-
 const boulesPerPlayer = (playerCount: number): number => (playerCount <= 2 ? 3 : 2);
 
 export const recordRound = async (
@@ -79,12 +72,5 @@ export const recordRound = async (
 		game.team2Players.length * boulesPerPlayer(game.team2Players.length);
 
 	const round: Round = { scoringTeamIndex, points, expectedThrows, timestamp: new Date() };
-	const newRounds = [...game.rounds, round];
-	const score = computeScore(newRounds);
-
-	const completed = score[scoringTeamIndex] >= game.targetScore;
-	await db.games.update(gameId, {
-		rounds: newRounds,
-		...(completed ? { status: 'completed' as const, endedAt: new Date() } : {}),
-	});
+	await db.games.update(gameId, { rounds: [...game.rounds, round] });
 };

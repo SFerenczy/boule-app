@@ -217,17 +217,9 @@ describe('recordRound', () => {
 		expect(game?.rounds[0]?.expectedThrows).toBe(12);
 	});
 
-	it('auto-completes at target score', async () => {
+	it('stays in-progress at target score (no auto-complete)', async () => {
 		const id = await createGame(db, 'A', 'B');
 		await recordRound(db, id, 0, 13);
-		const game = await db.games.get(id);
-		expect(game?.status).toBe('completed');
-		expect(game?.endedAt).toBeDefined();
-	});
-
-	it('stays in-progress below target', async () => {
-		const id = await createGame(db, 'A', 'B');
-		await recordRound(db, id, 0, 6);
 		const game = await db.games.get(id);
 		expect(game?.status).toBe('in-progress');
 		expect(game?.endedAt).toBeUndefined();

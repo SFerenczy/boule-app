@@ -98,10 +98,6 @@
 	async function handleScoreRound(teamIndex: 0 | 1, points: number) {
 		if (!activeGame?.id) return;
 		await recordRound(db, activeGame.id, teamIndex, points);
-		const game = await db.games.get(activeGame.id);
-		if (game?.status === 'completed') {
-			lastCompletedGame = game;
-		}
 	}
 </script>
 
