@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Game } from '$lib/types';
 	import type { RoundHistoryEntry } from '$lib/stats';
-	import { deriveRoundProgress } from '$lib/stats';
+	import { deriveRoundProgress, deriveTeamRoundProgress } from '$lib/stats';
 	import TeamCard from './TeamCard.svelte';
 	import ScoreHeader from './ScoreHeader.svelte';
 	import RoundHistory from './RoundHistory.svelte';
@@ -100,6 +100,18 @@
 			: undefined,
 	);
 
+	const team1RoundProgress = $derived(
+		trackingEnabled
+			? deriveTeamRoundProgress(game.history, roundNumber, 0, game.team1Players.length)
+			: undefined,
+	);
+
+	const team2RoundProgress = $derived(
+		trackingEnabled
+			? deriveTeamRoundProgress(game.history, roundNumber, 1, game.team2Players.length)
+			: undefined,
+	);
+
 	const modalPlayers = $derived(
 		pendingAction ? (pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players) : [],
 	);
@@ -113,21 +125,41 @@
 	{/if}
 
 	<div class="flex flex-col p-4">
-		<TeamCard
-			teamName={game.team1Name}
-			history={game.history}
-			teamIndex={0}
-			onUpdate={(category, type) => handleStatTap(0, category, type)}
-		/>
+		{#if team1RoundProgress}
+			<TeamCard
+				teamName={game.team1Name}
+				history={game.history}
+				teamIndex={0}
+				roundProgress={team1RoundProgress}
+				onUpdate={(category, type) => handleStatTap(0, category, type)}
+			/>
+		{:else}
+			<TeamCard
+				teamName={game.team1Name}
+				history={game.history}
+				teamIndex={0}
+				onUpdate={(category, type) => handleStatTap(0, category, type)}
+			/>
+		{/if}
 
 		<hr class="my-3" />
 
-		<TeamCard
-			teamName={game.team2Name}
-			history={game.history}
-			teamIndex={1}
-			onUpdate={(category, type) => handleStatTap(1, category, type)}
-		/>
+		{#if team2RoundProgress}
+			<TeamCard
+				teamName={game.team2Name}
+				history={game.history}
+				teamIndex={1}
+				roundProgress={team2RoundProgress}
+				onUpdate={(category, type) => handleStatTap(1, category, type)}
+			/>
+		{:else}
+			<TeamCard
+				teamName={game.team2Name}
+				history={game.history}
+				teamIndex={1}
+				onUpdate={(category, type) => handleStatTap(1, category, type)}
+			/>
+		{/if}
 
 		<RoundHistory entries={roundHistory} />
 	</div>

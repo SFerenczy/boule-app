@@ -1,19 +1,22 @@
 <script lang="ts">
 	import type { HistoryEntry } from '$lib/types';
+	import type { RoundProgress } from '$lib/stats';
 	import { deriveTeamStats } from '$lib/stats';
 	import StatRow from './StatRow.svelte';
 	import TeamSummary from './TeamSummary.svelte';
-	import { pointing, shooting } from '$lib/paraglide/messages.js';
+	import { pointing, shooting, throws_progress } from '$lib/paraglide/messages.js';
 
 	const {
 		teamName,
 		history,
 		teamIndex,
+		roundProgress,
 		onUpdate,
 	}: {
 		readonly teamName: string;
 		readonly history: readonly HistoryEntry[];
 		readonly teamIndex: 0 | 1;
+		readonly roundProgress?: RoundProgress;
 		readonly onUpdate: (category: 'pointing' | 'shooting', type: 'success' | 'fail') => void;
 	} = $props();
 
@@ -22,7 +25,12 @@
 </script>
 
 <section class={`space-y-2 border-l-4 pl-4 ${accentClass}`}>
-	<h2 class="text-base font-semibold">{teamName}</h2>
+	<h2 class="text-base font-semibold">
+		{teamName}
+		{#if roundProgress && roundProgress.expected > 0}
+			<span class="text-surface-500 ml-1 text-xs font-normal">({throws_progress({ thrown: String(roundProgress.thrown), expected: String(roundProgress.expected) })})</span>
+		{/if}
+	</h2>
 	<div class="preset-stat-row">
 		<StatRow
 			label={pointing()}
