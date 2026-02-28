@@ -62,8 +62,14 @@
 		type: 'success' | 'fail',
 	) {
 		if (trackingEnabled) {
-			pendingAction = { teamIndex, category, type };
-			playerModalOpen = true;
+			const players = teamIndex === 0 ? game.team1Players : game.team2Players;
+			const soloPlayer = players.length === 1 ? players[0] : undefined;
+			if (soloPlayer) {
+				onRecord(teamIndex, category, type, soloPlayer);
+			} else {
+				pendingAction = { teamIndex, category, type };
+				playerModalOpen = true;
+			}
 		} else {
 			onRecord(teamIndex, category, type, 'Anonymous');
 		}
