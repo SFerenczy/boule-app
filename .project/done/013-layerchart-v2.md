@@ -14,13 +14,13 @@ LayerChart v2 is the chosen charting library for the app (see [visualization res
 
 ## Tasks
 
-- [ ] Install LayerChart v2 (`npm install layerchart@next` or equivalent)
-- [ ] Install peer dependencies (d3 scale modules, etc.) as needed
-- [ ] Build a throwaway proof-of-concept chart on a temp route (e.g., `/dev/chart`)
-- [ ] Verify: renders correctly, styles pick up Tailwind classes, no SSR issues with adapter-static
-- [ ] Verify: works with Skeleton UI's theming (no style conflicts)
-- [ ] Remove the temp route and throwaway chart
-- [ ] Document any gotchas in a note on this ticket or in decisions.md
+- [x] Install LayerChart v2 (`pnpm add layerchart@next` → 2.0.0-next.46)
+- [x] Install peer dependencies (d3 scale modules, etc.) as needed — none needed, bundled internally
+- [x] Build a throwaway proof-of-concept chart on a temp route (`/dev/chart`)
+- [x] Verify: renders correctly, styles pick up Tailwind classes, no SSR issues with adapter-static
+- [x] Verify: works with Skeleton UI's theming (no style conflicts)
+- [x] Remove the temp route and throwaway chart
+- [x] Document any gotchas in a note on this ticket
 
 ## Acceptance
 
@@ -38,3 +38,7 @@ None.
 - Use v2 (pre-release / `@next` tag), not v1 compat mode. Decision made — see research doc.
 - If v2 proves unstable, fall back to Chart.js and update this ticket. But try v2 first.
 - LayerChart is built on Layer Cake — some Layer Cake docs may be relevant for understanding the primitives.
+- **No peer deps required.** d3-scale and other d3 modules are bundled inside LayerChart — no separate install needed.
+- **High-level chart components available.** `BarChart`, `LineChart`, `AreaChart`, `PieChart`, `ScatterChart` — these handle scales, axes, and layout automatically. Use `x` (string key) and `series` (array of `{ key, value, color }`) for simple cases.
+- **No SSR issues.** Builds clean with adapter-static, no browser-only guards needed.
+- **Skeleton UI compatible.** Theme colors via `var(--color-*)` tokens work in chart `color` props. No style conflicts observed.
