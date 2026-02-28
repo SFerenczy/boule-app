@@ -2,17 +2,31 @@
 	import { Dialog } from '@skeletonlabs/skeleton-svelte';
 	import { who_played } from '$lib/paraglide/messages.js';
 
+	export interface PlayerProgress {
+		readonly name: string;
+		readonly thrown: number;
+		readonly total: number;
+	}
+
 	const {
 		open,
 		players,
+		playerProgress,
 		onSelect,
 		onClose,
 	}: {
 		readonly open: boolean;
 		readonly players: readonly string[];
+		readonly playerProgress?: readonly PlayerProgress[];
 		readonly onSelect: (player: string) => void;
 		readonly onClose: () => void;
 	} = $props();
+
+	const progressMap = $derived(
+		playerProgress
+			? new Map(playerProgress.map((p) => [p.name, p]))
+			: undefined,
+	);
 </script>
 
 <Dialog
@@ -27,12 +41,28 @@
 			<Dialog.Title class="h3 font-bold">{who_played()}</Dialog.Title>
 			<div class="flex flex-col gap-6">
 				{#each players as player (player)}
+					{@const progress = progressMap?.get(player)}
+					{@const remaining = progress ? progress.total - progress.thrown : undefined}
+					{@const exhausted = remaining !== undefined && remaining <= 0}
 					<button
 						type="button"
-						class="btn preset-outlined-primary-500 min-h-20 w-full text-xl"
+						class="btn preset-outlined-primary-500 min-h-20 w-full text-xl {exhausted ? 'opacity-50' : ''}"
 						onclick={() => onSelect(player)}
 					>
-						{player}
+						<span class="flex flex-col items-center gap-1">
+							<span>{player}</span>
+							{#if progress}
+								<span class="flex gap-1 text-sm">
+									{#each Array(progress.total) as _, i}
+										{#if i < remaining!}
+											<span class="text-primary-500">●</span>
+										{:else}
+											<span class="text-surface-400">○</span>
+										{/if}
+									{/each}
+								</span>
+							{/if}
+						</span>
 					</button>
 				{/each}
 			</div>

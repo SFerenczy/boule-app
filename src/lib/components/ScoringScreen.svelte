@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { Game } from '$lib/types';
 	import type { RoundHistoryEntry } from '$lib/stats';
-	import { deriveRoundProgress, deriveTeamRoundProgress } from '$lib/stats';
+	import {
+		deriveRoundProgress,
+		deriveTeamRoundProgress,
+		derivePlayerRoundThrows,
+		boulesPerPlayer,
+	} from '$lib/stats';
 	import TeamCard from './TeamCard.svelte';
 	import ScoreHeader from './ScoreHeader.svelte';
 	import RoundHistory from './RoundHistory.svelte';
@@ -114,6 +119,19 @@
 
 	const modalPlayers = $derived(
 		pendingAction ? (pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players) : [],
+	);
+
+	const modalPlayerProgress = $derived(
+		pendingAction && trackingEnabled
+			? modalPlayers.map((name) => {
+					const playerCount = pendingAction!.teamIndex === 0 ? game.team1Players.length : game.team2Players.length;
+					return {
+						name,
+						thrown: derivePlayerRoundThrows(game.history, roundNumber, name),
+						total: boulesPerPlayer(playerCount),
+					};
+				})
+			: undefined,
 	);
 </script>
 
@@ -229,12 +247,25 @@
 	onClose={() => (roundModalOpen = false)}
 />
 
-<PlayerSelectModal
-	open={playerModalOpen}
-	players={modalPlayers}
-	onSelect={handlePlayerSelect}
-	onClose={() => {
-		playerModalOpen = false;
-		pendingAction = null;
-	}}
-/>
+{#if modalPlayerProgress}
+	<PlayerSelectModal
+		open={playerModalOpen}
+		players={modalPlayers}
+		playerProgress={modalPlayerProgress}
+		onSelect={handlePlayerSelect}
+		onClose={() => {
+			playerModalOpen = false;
+			pendingAction = null;
+		}}
+	/>
+{:else}
+	<PlayerSelectModal
+		open={playerModalOpen}
+		players={modalPlayers}
+		onSelect={handlePlayerSelect}
+		onClose={() => {
+			playerModalOpen = false;
+			pendingAction = null;
+		}}
+	/>
+{/if}
