@@ -69,9 +69,18 @@
 	) {
 		if (trackingEnabled) {
 			const players = teamIndex === 0 ? game.team1Players : game.team2Players;
-			const soloPlayer = players.length === 1 ? players[0] : undefined;
-			if (soloPlayer) {
-				onRecord(teamIndex, category, type, soloPlayer);
+			if (players.length === 1) {
+				onRecord(teamIndex, category, type, players[0] as string);
+				return;
+			}
+
+			const total = boulesPerPlayer(players.length);
+			const playersWithBoules = players.filter(
+				(p) => derivePlayerRoundThrows(game.history, roundNumber, p) < total,
+			);
+
+			if (playersWithBoules.length === 1) {
+				onRecord(teamIndex, category, type, playersWithBoules[0] as string);
 			} else {
 				pendingAction = { teamIndex, category, type };
 				playerModalOpen = true;
@@ -121,23 +130,33 @@
 		pendingAction ? (pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players) : [],
 	);
 
-	const modalPlayerProgress = $derived(
-		pendingAction && trackingEnabled
-			? modalPlayers.map((name) => {
-					const playerCount = pendingAction!.teamIndex === 0 ? game.team1Players.length : game.team2Players.length;
-					return {
-						name,
-						thrown: derivePlayerRoundThrows(game.history, roundNumber, name),
-						total: boulesPerPlayer(playerCount),
-					};
-				})
-			: undefined,
+	const allThrown = $derived(
+		roundProgress !== undefined &&
+			roundProgress.expected > 0 &&
+			roundProgress.thrown >= roundProgress.expected,
 	);
+
+	const modalPlayerProgress = $derived.by(() => {
+		if (!pendingAction || !trackingEnabled) return undefined;
+		const playerCount =
+			pendingAction.teamIndex === 0 ? game.team1Players.length : game.team2Players.length;
+		return modalPlayers.map((name) => ({
+			name,
+			thrown: derivePlayerRoundThrows(game.history, roundNumber, name),
+			total: boulesPerPlayer(playerCount),
+		}));
+	});
 </script>
 
 <div class="flex min-h-screen flex-col">
 	{#if roundProgress}
-		<ScoreHeader team1Name={game.team1Name} team2Name={game.team2Name} {score} {roundNumber} {roundProgress} />
+		<ScoreHeader
+			team1Name={game.team1Name}
+			team2Name={game.team2Name}
+			{score}
+			{roundNumber}
+			{roundProgress}
+		/>
 	{:else}
 		<ScoreHeader team1Name={game.team1Name} team2Name={game.team2Name} {score} {roundNumber} />
 	{/if}
@@ -185,7 +204,7 @@
 	<div class="mt-auto flex flex-col gap-2 p-4 pt-2">
 		<button
 			type="button"
-			class="btn preset-filled-primary-500 w-full"
+			class="btn preset-filled-primary-500 w-full {allThrown ? 'animate-pulse' : ''}"
 			onclick={() => (roundModalOpen = true)}
 		>
 			{score_round()}

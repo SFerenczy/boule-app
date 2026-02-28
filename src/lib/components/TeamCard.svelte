@@ -28,7 +28,12 @@
 	<h2 class="text-base font-semibold">
 		{teamName}
 		{#if roundProgress && roundProgress.expected > 0}
-			<span class="text-surface-500 ml-1 text-xs font-normal">({throws_progress({ thrown: String(roundProgress.thrown), expected: String(roundProgress.expected) })})</span>
+			<span class="text-surface-500 ml-1 text-xs font-normal"
+				>({throws_progress({
+					thrown: String(roundProgress.thrown),
+					expected: String(roundProgress.expected),
+				})})</span
+			>
 		{/if}
 	</h2>
 	<div class="preset-stat-row">

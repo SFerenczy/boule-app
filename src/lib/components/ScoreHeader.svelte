@@ -24,7 +24,10 @@
 		{team2Name}
 		<span class="text-surface-500 ml-2 text-xs font-normal"
 			>{roundMsg({ number: String(roundNumber) })}{#if roundProgress && roundProgress.expected > 0}
-				· {throws_progress({ thrown: String(roundProgress.thrown), expected: String(roundProgress.expected) })}{/if}</span
+				· {throws_progress({
+					thrown: String(roundProgress.thrown),
+					expected: String(roundProgress.expected),
+				})}{/if}</span
 		>
 	</div>
 </header>

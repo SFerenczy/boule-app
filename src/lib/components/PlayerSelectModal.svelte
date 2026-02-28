@@ -23,9 +23,7 @@
 	} = $props();
 
 	const progressMap = $derived(
-		playerProgress
-			? new Map(playerProgress.map((p) => [p.name, p]))
-			: undefined,
+		playerProgress ? new Map(playerProgress.map((p) => [p.name, p])) : undefined,
 	);
 </script>
 
@@ -46,15 +44,17 @@
 					{@const exhausted = remaining !== undefined && remaining <= 0}
 					<button
 						type="button"
-						class="btn preset-outlined-primary-500 min-h-20 w-full text-xl {exhausted ? 'opacity-50' : ''}"
+						class="btn preset-outlined-primary-500 min-h-20 w-full text-xl {exhausted
+							? 'opacity-50'
+							: ''}"
 						onclick={() => onSelect(player)}
 					>
 						<span class="flex flex-col items-center gap-1">
 							<span>{player}</span>
-							{#if progress}
+							{#if progress && remaining !== undefined}
 								<span class="flex gap-1 text-sm">
-									{#each Array(progress.total) as _, i}
-										{#if i < remaining!}
+									{#each Array.from({ length: progress.total }, (_, i) => i) as i (i)}
+										{#if i < remaining}
 											<span class="text-primary-500">●</span>
 										{:else}
 											<span class="text-surface-400">○</span>
