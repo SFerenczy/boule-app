@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 	import { liveQuery } from 'dexie';
@@ -17,7 +18,7 @@
 			document.documentElement.lang = getLocale();
 
 			if ('serviceWorker' in navigator) {
-				navigator.serviceWorker.register('/service-worker.js');
+				navigator.serviceWorker.register(`${base}/service-worker.js`);
 			}
 		}
 
@@ -35,7 +36,9 @@
 	const showNav = $derived(!hasActiveGame);
 </script>
 
-{@render children()}
+<div class={showNav ? 'pb-14' : ''}>
+	{@render children()}
+</div>
 
 {#if showNav}
 	<BottomNav currentPath={page.url.pathname} />
