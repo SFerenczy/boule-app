@@ -5,6 +5,9 @@ import {
 	getPlayerGameStats,
 	getPlayerOverallStats,
 	getPlayerTimeSeries,
+	getCurrentPlayerName,
+	getPlayerDayOfWeekStats,
+	getPlayerRecentForm,
 } from '$lib/stats/player-stats';
 
 const makeEntry = (
@@ -267,5 +270,147 @@ describe('getPlayerTimeSeries', () => {
 		expect(series).toHaveLength(1);
 		expect(series[0]!.won).toBe(true);
 		expect(series[0]!.overall).toEqual({ successes: 1, attempts: 2, rate: 50 });
+	});
+});
+
+describe('getCurrentPlayerName', () => {
+	it('returns null for empty games', () => {
+		expect(getCurrentPlayerName([])).toBe(null);
+	});
+
+	it('returns null when all games are Anonymous', () => {
+		const games = [makeGame({ team1Players: ['Anonymous'] })];
+		expect(getCurrentPlayerName(games)).toBe(null);
+	});
+
+	it('returns the most common team1Players[0]', () => {
+		const games = [
+			makeGame({ id: 1, team1Players: ['Alice', 'Bob'] }),
+			makeGame({ id: 2, team1Players: ['Alice', 'Bob'] }),
+			makeGame({ id: 3, team1Players: ['Charlie', 'Diana'] }),
+		];
+		expect(getCurrentPlayerName(games)).toBe('Alice');
+	});
+
+	it('ignores Anonymous entries', () => {
+		const games = [
+			makeGame({ id: 1, team1Players: ['Anonymous'] }),
+			makeGame({ id: 2, team1Players: ['Anonymous'] }),
+			makeGame({ id: 3, team1Players: ['Alice'] }),
+		];
+		expect(getCurrentPlayerName(games)).toBe('Alice');
+	});
+});
+
+describe('getPlayerRecentForm', () => {
+	it('returns null rates for no games', () => {
+		const result = getPlayerRecentForm([], 'Alice');
+		expect(result).toEqual({
+			recentRate: null,
+			alltimeRate: null,
+			recentGames: 0,
+			totalGames: 0,
+		});
+	});
+
+	it('returns same rate for recent and alltime with fewer games than window', () => {
+		const games = [
+			makeGame({
+				id: 1,
+				startedAt: new Date('2025-06-01'),
+				history: [
+					makeEntry({ player: 'Alice', category: 'pointing', type: 'success' }),
+					makeEntry({ player: 'Alice', category: 'pointing', type: 'fail' }),
+				],
+			}),
+		];
+		const result = getPlayerRecentForm(games, 'Alice');
+		expect(result.recentRate).toBe(50);
+		expect(result.alltimeRate).toBe(50);
+		expect(result.recentGames).toBe(1);
+		expect(result.totalGames).toBe(1);
+	});
+
+	it('computes recent form from last N games only', () => {
+		const games = Array.from({ length: 6 }, (_, i) =>
+			makeGame({
+				id: i + 1,
+				startedAt: new Date(`2025-06-0${i + 1}`),
+				history: [
+					makeEntry({
+						player: 'Alice',
+						category: 'pointing',
+						// First game: fail, games 2-6: success
+						type: i === 0 ? 'fail' : 'success',
+					}),
+				],
+			}),
+		);
+		const result = getPlayerRecentForm(games, 'Alice');
+		// Last 5 games (2-6): all success → 100%
+		expect(result.recentRate).toBe(100);
+		// All 6 games: 5/6 → 83%
+		expect(result.alltimeRate).toBe(83);
+		expect(result.recentGames).toBe(5);
+		expect(result.totalGames).toBe(6);
+	});
+
+	it('respects custom window size', () => {
+		const games = Array.from({ length: 4 }, (_, i) =>
+			makeGame({
+				id: i + 1,
+				startedAt: new Date(`2025-06-0${i + 1}`),
+				history: [
+					makeEntry({
+						player: 'Alice',
+						category: 'pointing',
+						type: i < 2 ? 'fail' : 'success',
+					}),
+				],
+			}),
+		);
+		const result = getPlayerRecentForm(games, 'Alice', 2);
+		// Last 2 games: both success → 100%
+		expect(result.recentRate).toBe(100);
+		expect(result.recentGames).toBe(2);
+	});
+});
+
+describe('getPlayerDayOfWeekStats', () => {
+	it('returns 7 entries ordered Mon to Sun', () => {
+		const result = getPlayerDayOfWeekStats([], 'Alice');
+		expect(result).toHaveLength(7);
+		expect(result[0]!.day).toBe(1); // Monday
+		expect(result[6]!.day).toBe(0); // Sunday
+	});
+
+	it('uses provided day labels', () => {
+		const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+		const result = getPlayerDayOfWeekStats([], 'Alice', labels);
+		expect(result[0]!.label).toBe('M');
+		expect(result[6]!.label).toBe('S');
+	});
+
+	it('groups stats by day of week', () => {
+		// 2025-06-02 is a Monday
+		const games = [
+			makeGame({
+				id: 1,
+				startedAt: new Date('2025-06-02'),
+				history: [
+					makeEntry({ player: 'Alice', category: 'pointing', type: 'success' }),
+					makeEntry({ player: 'Alice', category: 'pointing', type: 'fail' }),
+				],
+			}),
+		];
+		const result = getPlayerDayOfWeekStats(games, 'Alice');
+		const monday = result[0]!;
+		expect(monday.day).toBe(1);
+		expect(monday.stats).toEqual({ successes: 1, attempts: 2, rate: 50 });
+	});
+
+	it('returns null rate for days with no games', () => {
+		const result = getPlayerDayOfWeekStats([], 'Alice');
+		expect(result[0]!.stats.rate).toBe(null);
 	});
 });

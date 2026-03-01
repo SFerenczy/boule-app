@@ -43,6 +43,19 @@ export interface PlayerGameDataPoint {
 	readonly overall: CategoryStats;
 }
 
+export interface DayOfWeekStats {
+	readonly day: number;
+	readonly label: string;
+	readonly stats: CategoryStats;
+}
+
+export interface RecentFormStats {
+	readonly recentRate: number | null;
+	readonly alltimeRate: number | null;
+	readonly recentGames: number;
+	readonly totalGames: number;
+}
+
 export interface Game {
 	readonly id?: number;
 	readonly team1Name: string;
