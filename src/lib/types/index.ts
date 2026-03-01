@@ -17,6 +17,32 @@ export interface Round {
 	readonly timestamp: Date;
 }
 
+export interface CategoryStats {
+	readonly successes: number;
+	readonly attempts: number;
+	readonly rate: number | null;
+}
+
+export interface PlayerOverallStats {
+	readonly games: number;
+	readonly wins: number;
+	readonly losses: number;
+	readonly totalThrows: number;
+	readonly pointing: CategoryStats;
+	readonly shooting: CategoryStats;
+	readonly overall: CategoryStats;
+}
+
+export interface PlayerGameDataPoint {
+	readonly gameId: number;
+	readonly date: Date;
+	readonly won: boolean | null;
+	readonly score: readonly [number, number];
+	readonly pointing: CategoryStats;
+	readonly shooting: CategoryStats;
+	readonly overall: CategoryStats;
+}
+
 export interface Game {
 	readonly id?: number;
 	readonly team1Name: string;
