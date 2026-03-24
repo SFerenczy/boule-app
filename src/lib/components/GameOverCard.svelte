@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { game_over, final_score, new_game } from '$lib/paraglide/messages.js';
+	import { game_over, final_score, new_game, end_count } from '$lib/paraglide/messages.js';
 
 	const {
 		team1Name,
@@ -26,8 +26,7 @@
 			{team2Name}
 		</div>
 		<div class="text-surface-500 text-sm">
-			{roundCount}
-			{roundCount === 1 ? 'round' : 'rounds'}
+			{end_count({ count: roundCount })}
 		</div>
 		<button
 			type="button"

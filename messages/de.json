@@ -30,6 +30,7 @@
 	"round_history": "Spielverlauf",
 	"select_team": "Welches Team hat gepunktet?",
 	"select_points": "Wie viele Punkte?",
+	"end_count": "{count} Aufnahmen",
 	"final_score": "Endergebnis",
 	"throws_progress": "{thrown}/{expected}",
 	"nav_home": "Start",

@@ -30,6 +30,7 @@
 	"round_history": "Déroulement",
 	"select_team": "Quelle équipe a marqué ?",
 	"select_points": "Combien de points ?",
+	"end_count": "{count} mènes",
 	"final_score": "Score final",
 	"throws_progress": "{thrown}/{expected}",
 	"nav_home": "Accueil",
