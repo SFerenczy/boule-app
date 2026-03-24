@@ -95,7 +95,7 @@
 		if (game) lastCompletedGame = game;
 	}
 
-	async function handleScoreRound(teamIndex: 0 | 1, points: number) {
+	async function handleScoreRound(teamIndex: 0 | 1 | null, points: number) {
 		if (!activeGame?.id) return;
 		await recordRound(db, activeGame.id, teamIndex, points);
 	}

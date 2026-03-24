@@ -60,7 +60,7 @@ export const completeGame = async (db: BoubleDB, gameId: number): Promise<void> 
 export const recordRound = async (
 	db: BoubleDB,
 	gameId: number,
-	scoringTeamIndex: 0 | 1,
+	scoringTeamIndex: 0 | 1 | null,
 	points: number,
 ): Promise<void> => {
 	const game = await db.games.get(gameId);

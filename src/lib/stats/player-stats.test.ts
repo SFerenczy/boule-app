@@ -20,7 +20,7 @@ const makeEntry = (
 	...overrides,
 });
 
-const makeRound = (scoringTeamIndex: 0 | 1, points: number): Round => ({
+const makeRound = (scoringTeamIndex: 0 | 1 | null, points: number): Round => ({
 	scoringTeamIndex,
 	points,
 	expectedThrows: 12,

@@ -225,6 +225,15 @@ describe('recordRound', () => {
 		expect(game?.endedAt).toBeUndefined();
 	});
 
+	it('records dead-end round with null scoringTeamIndex', async () => {
+		const id = await createGame(db, 'Team A', 'Team B', ['Alice', 'Bob'], ['Charlie', 'Dave']);
+		await recordRound(db, id, null, 0);
+		const game = await db.games.get(id);
+		expect(game?.rounds).toHaveLength(1);
+		expect(game?.rounds[0]?.scoringTeamIndex).toBeNull();
+		expect(game?.rounds[0]?.points).toBe(0);
+	});
+
 	it('throws for unknown game id', async () => {
 		await expect(recordRound(db, 999, 0, 1)).rejects.toThrow('Game 999 not found');
 	});

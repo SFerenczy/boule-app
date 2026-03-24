@@ -11,7 +11,7 @@ export interface HistoryEntry {
 }
 
 export interface Round {
-	readonly scoringTeamIndex: 0 | 1;
+	readonly scoringTeamIndex: 0 | 1 | null;
 	readonly points: number;
 	readonly expectedThrows: number;
 	readonly timestamp: Date;

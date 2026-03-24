@@ -223,7 +223,7 @@ describe('derivePlayerRoundThrows', () => {
 	});
 });
 
-const round = (scoringTeamIndex: 0 | 1, points: number): Round => ({
+const round = (scoringTeamIndex: 0 | 1 | null, points: number): Round => ({
 	scoringTeamIndex,
 	points,
 	expectedThrows: 12,
@@ -239,6 +239,11 @@ describe('deriveScore', () => {
 		const rounds = [round(0, 3), round(1, 1), round(0, 2)];
 		expect(deriveScore(rounds)).toEqual([5, 1]);
 	});
+
+	it('ignores dead-end rounds (null scoringTeamIndex)', () => {
+		const rounds = [round(0, 3), round(null, 0), round(1, 2)];
+		expect(deriveScore(rounds)).toEqual([3, 2]);
+	});
 });
 
 describe('deriveRoundHistory', () => {
@@ -249,8 +254,17 @@ describe('deriveRoundHistory', () => {
 	it('maps rounds to history entries with team names', () => {
 		const rounds = [round(0, 3), round(1, 2)];
 		expect(deriveRoundHistory(rounds, 'Team A', 'Team B')).toEqual([
-			{ roundNumber: 1, teamName: 'Team A', points: 3 },
-			{ roundNumber: 2, teamName: 'Team B', points: 2 },
+			{ roundNumber: 1, teamName: 'Team A', points: 3, isDeadEnd: false },
+			{ roundNumber: 2, teamName: 'Team B', points: 2, isDeadEnd: false },
+		]);
+	});
+
+	it('marks dead-end rounds correctly', () => {
+		const rounds = [round(0, 3), round(null, 0), round(1, 2)];
+		expect(deriveRoundHistory(rounds, 'Team A', 'Team B')).toEqual([
+			{ roundNumber: 1, teamName: 'Team A', points: 3, isDeadEnd: false },
+			{ roundNumber: 2, teamName: null, points: 0, isDeadEnd: true },
+			{ roundNumber: 3, teamName: 'Team B', points: 2, isDeadEnd: false },
 		]);
 	});
 });

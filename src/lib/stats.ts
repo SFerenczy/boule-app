@@ -53,7 +53,11 @@ export const deriveTotals = (stats: DerivedStats): DerivedTotals => {
 export const deriveScore = (rounds: readonly Round[]): readonly [number, number] =>
 	rounds.reduce<readonly [number, number]>(
 		(acc, r) =>
-			r.scoringTeamIndex === 0 ? [acc[0] + r.points, acc[1]] : [acc[0], acc[1] + r.points],
+			r.scoringTeamIndex === null
+				? acc
+				: r.scoringTeamIndex === 0
+					? [acc[0] + r.points, acc[1]]
+					: [acc[0], acc[1] + r.points],
 		[0, 0],
 	);
 
@@ -96,8 +100,9 @@ export const derivePlayerRoundThrows = (
 
 export interface RoundHistoryEntry {
 	readonly roundNumber: number;
-	readonly teamName: string;
+	readonly teamName: string | null;
 	readonly points: number;
+	readonly isDeadEnd: boolean;
 }
 
 export const deriveRoundHistory = (
@@ -107,6 +112,7 @@ export const deriveRoundHistory = (
 ): readonly RoundHistoryEntry[] =>
 	rounds.map((r, i) => ({
 		roundNumber: i + 1,
-		teamName: r.scoringTeamIndex === 0 ? team1Name : team2Name,
+		teamName: r.scoringTeamIndex === null ? null : r.scoringTeamIndex === 0 ? team1Name : team2Name,
 		points: r.points,
+		isDeadEnd: r.scoringTeamIndex === null,
 	}));

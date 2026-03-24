@@ -49,7 +49,7 @@
 		) => void;
 		readonly onEndGame: () => void;
 		readonly onUndo?: () => void;
-		readonly onScoreRound: (teamIndex: 0 | 1, points: number) => void;
+		readonly onScoreRound: (teamIndex: 0 | 1 | null, points: number) => void;
 		readonly canUndo?: boolean;
 	} = $props();
 
@@ -98,7 +98,7 @@
 		playerModalOpen = false;
 	}
 
-	function handleRoundScore(teamIndex: 0 | 1, points: number) {
+	function handleRoundScore(teamIndex: 0 | 1 | null, points: number) {
 		roundModalOpen = false;
 		onScoreRound(teamIndex, points);
 	}
