@@ -6,7 +6,6 @@
 		track_players,
 		team_size,
 		player_name,
-		me,
 	} from '$lib/paraglide/messages.js';
 	import { Switch } from '@skeletonlabs/skeleton-svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
@@ -27,7 +26,7 @@
 	let team2Name = $state(team2_label());
 	let trackPlayers = $state(false);
 	let teamSize = $state<1 | 2 | 3>(2);
-	let team1Players = $state<readonly string[]>([me(), defaultPlayerName(2)]);
+	let team1Players = $state<readonly string[]>([defaultPlayerName(1), defaultPlayerName(2)]);
 	let team2Players = $state<readonly string[]>([defaultPlayerName(3), defaultPlayerName(4)]);
 
 	const STORAGE_KEY = 'boule-player-settings';
@@ -37,7 +36,7 @@
 	}
 
 	function buildTeam1Defaults(size: number): readonly string[] {
-		return [me(), ...Array.from({ length: size - 1 }, (_, i) => defaultPlayerName(i + 2))];
+		return Array.from({ length: size }, (_, i) => defaultPlayerName(i + 1));
 	}
 
 	function buildTeam2Defaults(size: number): readonly string[] {
@@ -59,13 +58,10 @@
 				if ([1, 2, 3].includes(settings.teamSize)) teamSize = settings.teamSize;
 				if (Array.isArray(settings.team1Players)) {
 					const saved: readonly string[] = settings.team1Players;
-					team1Players = [
-						me(),
-						...Array.from(
-							{ length: teamSize - 1 },
-							(_, i) => saved[i + 1] ?? defaultPlayerName(i + 2),
-						),
-					];
+					team1Players = Array.from(
+						{ length: teamSize },
+						(_, i) => saved[i] ?? defaultPlayerName(i + 1),
+					);
 				}
 				if (Array.isArray(settings.team2Players)) {
 					const saved: readonly string[] = settings.team2Players;
@@ -93,9 +89,7 @@
 		let p2: readonly string[];
 
 		if (trackPlayers) {
-			p1 = team1Players
-				.map((p) => p.trim())
-				.map((p, i) => p || (i === 0 ? me() : defaultPlayerName(i + 1)));
+			p1 = team1Players.map((p) => p.trim()).map((p, i) => p || defaultPlayerName(i + 1));
 			p2 = team2Players
 				.map((p) => p.trim())
 				.map((p, i) => p || defaultPlayerName(teamSize + i + 1));
@@ -179,25 +173,15 @@
 			{#if trackPlayers}
 				<div class="ml-4 mt-1 flex flex-col gap-2">
 					{#each Array.from({ length: teamSize }, (_, i) => i) as i (i)}
-						{#if i === 0}
-							<input
-								type="text"
-								class="preset-form-input w-full cursor-default opacity-60"
-								value={me()}
-								tabindex={-1}
-								readonly
-							/>
-						{:else}
-							<input
-								type="text"
-								class="preset-form-input w-full"
-								value={team1Players[i] ?? ''}
-								oninput={(e) => {
-									team1Players = updatePlayer(team1Players, i, e.currentTarget.value);
-								}}
-								placeholder={defaultPlayerName(i + 1)}
-							/>
-						{/if}
+						<input
+							type="text"
+							class="preset-form-input w-full"
+							value={team1Players[i] ?? ''}
+							oninput={(e) => {
+								team1Players = updatePlayer(team1Players, i, e.currentTarget.value);
+							}}
+							placeholder={defaultPlayerName(i + 1)}
+						/>
 					{/each}
 				</div>
 			{/if}

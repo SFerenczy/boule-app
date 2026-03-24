@@ -243,14 +243,14 @@ describe('deriveScore', () => {
 
 describe('deriveRoundHistory', () => {
 	it('returns empty array for no rounds', () => {
-		expect(deriveRoundHistory([], 'We', 'They')).toEqual([]);
+		expect(deriveRoundHistory([], 'Team A', 'Team B')).toEqual([]);
 	});
 
 	it('maps rounds to history entries with team names', () => {
 		const rounds = [round(0, 3), round(1, 2)];
-		expect(deriveRoundHistory(rounds, 'We', 'They')).toEqual([
-			{ roundNumber: 1, teamName: 'We', points: 3 },
-			{ roundNumber: 2, teamName: 'They', points: 2 },
+		expect(deriveRoundHistory(rounds, 'Team A', 'Team B')).toEqual([
+			{ roundNumber: 1, teamName: 'Team A', points: 3 },
+			{ roundNumber: 2, teamName: 'Team B', points: 2 },
 		]);
 	});
 });

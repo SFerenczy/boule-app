@@ -142,11 +142,11 @@ describe('Scoring Screen Page', () => {
 		const user = userEvent.setup();
 		await user.click(startButton);
 
-		// Should now show scoring screen with default team names (We/They)
-		const weElements = await screen.findAllByText('We');
-		expect(weElements.length).toBeGreaterThanOrEqual(1);
-		const theyElements = screen.getAllByText('They');
-		expect(theyElements.length).toBeGreaterThanOrEqual(1);
+		// Should now show scoring screen with default team names (Team A/Team B)
+		const teamAElements = await screen.findAllByText('Team A');
+		expect(teamAElements.length).toBeGreaterThanOrEqual(1);
+		const teamBElements = screen.getAllByText('Team B');
+		expect(teamBElements.length).toBeGreaterThanOrEqual(1);
 
 		// Verify the game was persisted
 		const active = await getActiveGame(db);
