@@ -6,6 +6,7 @@ import {
 	getPlayerOverallStats,
 	getPlayerTimeSeries,
 	getCurrentPlayerName,
+	getAllPlayerNames,
 	getPlayerDayOfWeekStats,
 	getPlayerRecentForm,
 } from '$lib/stats/player-stats';
@@ -299,6 +300,37 @@ describe('getCurrentPlayerName', () => {
 			makeGame({ id: 3, team1Players: ['Alice'] }),
 		];
 		expect(getCurrentPlayerName(games)).toBe('Alice');
+	});
+});
+
+describe('getAllPlayerNames', () => {
+	it('returns empty array for no games', () => {
+		expect(getAllPlayerNames([])).toEqual([]);
+	});
+
+	it('returns sorted unique player names from both teams', () => {
+		const games = [
+			makeGame({ team1Players: ['Charlie', 'Alice'], team2Players: ['Bob', 'Diana'] }),
+		];
+		expect(getAllPlayerNames(games)).toEqual(['Alice', 'Bob', 'Charlie', 'Diana']);
+	});
+
+	it('excludes Anonymous players', () => {
+		const games = [makeGame({ team1Players: ['Anonymous', 'Alice'], team2Players: ['Anonymous'] })];
+		expect(getAllPlayerNames(games)).toEqual(['Alice']);
+	});
+
+	it('deduplicates players across games', () => {
+		const games = [
+			makeGame({ id: 1, team1Players: ['Alice', 'Bob'], team2Players: ['Charlie'] }),
+			makeGame({ id: 2, team1Players: ['Alice'], team2Players: ['Diana'] }),
+		];
+		expect(getAllPlayerNames(games)).toEqual(['Alice', 'Bob', 'Charlie', 'Diana']);
+	});
+
+	it('returns empty array when all players are Anonymous', () => {
+		const games = [makeGame({ team1Players: ['Anonymous'], team2Players: ['Anonymous'] })];
+		expect(getAllPlayerNames(games)).toEqual([]);
 	});
 });
 

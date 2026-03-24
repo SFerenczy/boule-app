@@ -6,7 +6,7 @@
 	import { db } from '$lib/db';
 	import type { Game } from '$lib/types';
 	import {
-		getCurrentPlayerName,
+		getAllPlayerNames,
 		getPlayerOverallStats,
 		getPlayerTimeSeries,
 		getPlayerDayOfWeekStats,
@@ -14,6 +14,7 @@
 	} from '$lib/stats/player-stats';
 	import {
 		stats_title,
+		stats_select_player,
 		stats_games,
 		stats_throws,
 		stats_success_rate,
@@ -55,8 +56,15 @@
 		return () => subscription.unsubscribe();
 	});
 
-	const playerName = $derived(getCurrentPlayerName(games));
-	const hasData = $derived(playerName !== null);
+	const allPlayers = $derived(getAllPlayerNames(games));
+	let selectedPlayer = $state<string | null>(null);
+
+	// Auto-select first player when list loads and nothing is selected yet
+	const playerName = $derived.by(() => {
+		if (selectedPlayer !== null && allPlayers.includes(selectedPlayer)) return selectedPlayer;
+		return allPlayers[0] ?? null;
+	});
+	const hasData = $derived(allPlayers.length > 0);
 
 	const overallStats = $derived(playerName ? getPlayerOverallStats(games, playerName) : null);
 
@@ -135,6 +143,25 @@
 {:else if overallStats}
 	<div class="space-y-6 p-4 pb-20">
 		<h1 class="h2 font-bold">{stats_title()}</h1>
+
+		<!-- Player selector -->
+		{#if allPlayers.length > 1}
+			<div>
+				<label for="player-select" class="sr-only">{stats_select_player()}</label>
+				<select
+					id="player-select"
+					class="select preset-outlined-surface-500 w-full min-h-12 text-lg"
+					value={playerName}
+					onchange={(e) => {
+						selectedPlayer = e.currentTarget.value;
+					}}
+				>
+					{#each allPlayers as name (name)}
+						<option value={name}>{name}</option>
+					{/each}
+				</select>
+			</div>
+		{/if}
 
 		<!-- Summary cards -->
 		<div class="grid grid-cols-2 gap-4">

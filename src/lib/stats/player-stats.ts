@@ -130,6 +130,19 @@ export const getCurrentPlayerName = (games: readonly Game[]): string | null => {
 	)[0];
 };
 
+export const getAllPlayerNames = (games: readonly Game[]): readonly string[] => {
+	const names = games.reduce<ReadonlySet<string>>(
+		(acc, game) =>
+			new Set([
+				...acc,
+				...game.team1Players.filter((p) => p !== 'Anonymous'),
+				...game.team2Players.filter((p) => p !== 'Anonymous'),
+			]),
+		new Set(),
+	);
+	return [...names].sort((a, b) => a.localeCompare(b));
+};
+
 export const getPlayerRecentForm = (
 	games: readonly Game[],
 	playerName: string,
