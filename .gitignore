@@ -24,3 +24,7 @@ src/lib/paraglide/
 /build/
 node_modules/
 .svelte-kit/
+
+# Playwright
+/test-results/
+/playwright-report/

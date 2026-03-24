@@ -45,6 +45,10 @@ typecheck:
 # Full quality gate
 check: format-check lint typecheck test
 
+# Run Playwright E2E tests
+e2e *args='':
+    pnpm exec playwright test {{args}}
+
 # Take a mobile screenshot of a route (starts dev server if needed)
 screenshot route='/':
     node scripts/screenshot.mjs {{route}}
