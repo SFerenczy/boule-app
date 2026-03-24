@@ -11,6 +11,7 @@ Replace informal round terminology with standard pétanque terms across all i18n
 ## Context
 
 Pétanque has specific terminology that differs from casual "round" language. Using correct terms improves authenticity and is standard in the sport:
+
 - DE: "Aufnahme" (not "Runde")
 - EN: "End" (not "Round")
 - FR: "Mène" (not "Manche")
