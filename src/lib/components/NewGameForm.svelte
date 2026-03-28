@@ -8,7 +8,6 @@
 		player_name,
 	} from '$lib/paraglide/messages.js';
 	import { Switch } from '@skeletonlabs/skeleton-svelte';
-	import LanguageSelector from './LanguageSelector.svelte';
 	import { onMount } from 'svelte';
 
 	const {
@@ -213,9 +212,5 @@
 		</div>
 
 		<button type="submit" class="preset-page-action mt-2">{start_game()}</button>
-
-		<div class="flex justify-center">
-			<LanguageSelector />
-		</div>
 	</form>
 </div>
