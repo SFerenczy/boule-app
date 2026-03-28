@@ -20,5 +20,17 @@ export default defineConfig({
 		include: ['src/**/*.test.ts'],
 		environment: 'jsdom',
 		setupFiles: ['src/test/setup.ts'],
+		coverage: {
+			provider: 'v8',
+			reporter: ['text', 'text-summary', 'lcov'],
+			include: ['src/lib/**/*.ts'],
+			exclude: ['src/lib/paraglide/**', '**/*.test.ts', '**/*.spec.ts', 'src/test/**'],
+			thresholds: {
+				lines: 50,
+				functions: 50,
+				branches: 50,
+				statements: 50,
+			},
+		},
 	},
 });

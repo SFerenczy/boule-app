@@ -10,21 +10,23 @@
 	import { Switch } from '@skeletonlabs/skeleton-svelte';
 	import { onMount } from 'svelte';
 
-	const {
-		onStart,
-	}: {
+	interface NewGameFormProps {
 		readonly onStart: (
 			team1Name: string,
 			team2Name: string,
 			team1Players: readonly string[],
 			team2Players: readonly string[],
 		) => void;
-	} = $props();
+	}
+
+	type TeamSize = 1 | 2 | 3;
+
+	const { onStart }: NewGameFormProps = $props();
 
 	let team1Name = $state(team1_label());
 	let team2Name = $state(team2_label());
 	let trackPlayers = $state(false);
-	let teamSize = $state<1 | 2 | 3>(2);
+	let teamSize = $state<TeamSize>(2);
 	let team1Players = $state<readonly string[]>([defaultPlayerName(1), defaultPlayerName(2)]);
 	let team2Players = $state<readonly string[]>([defaultPlayerName(3), defaultPlayerName(4)]);
 

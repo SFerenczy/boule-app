@@ -23,33 +23,38 @@ afterEach(async () => {
 
 describe('createGame', () => {
 	it('initializes with empty history', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		const game = await db.games.get(id);
 		expect(game?.history).toEqual([]);
 	});
 
 	it('sets status to in-progress', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		const game = await db.games.get(id);
 		expect(game?.status).toBe('in-progress');
 	});
 
 	it('persists team names', async () => {
-		const id = await createGame(db, 'Red', 'Blue');
+		const id = await createGame(db, { team1Name: 'Red', team2Name: 'Blue' });
 		const game = await db.games.get(id);
 		expect(game?.team1Name).toBe('Red');
 		expect(game?.team2Name).toBe('Blue');
 	});
 
 	it('defaults players to Anonymous', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		const game = await db.games.get(id);
 		expect(game?.team1Players).toEqual(['Anonymous']);
 		expect(game?.team2Players).toEqual(['Anonymous']);
 	});
 
 	it('accepts custom player lists', async () => {
-		const id = await createGame(db, 'Team A', 'Team B', ['Alice', 'Bob'], ['Charlie']);
+		const id = await createGame(db, {
+			team1Name: 'Team A',
+			team2Name: 'Team B',
+			team1Players: ['Alice', 'Bob'],
+			team2Players: ['Charlie'],
+		});
 		const game = await db.games.get(id);
 		expect(game?.team1Players).toEqual(['Alice', 'Bob']);
 		expect(game?.team2Players).toEqual(['Charlie']);
@@ -63,13 +68,13 @@ describe('getActiveGame', () => {
 	});
 
 	it('returns the active game', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		const game = await getActiveGame(db);
 		expect(game?.status).toBe('in-progress');
 	});
 
 	it('does not return completed games', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await completeGame(db, id);
 		const game = await getActiveGame(db);
 		expect(game).toBeUndefined();
@@ -78,7 +83,7 @@ describe('getActiveGame', () => {
 
 describe('recordAction', () => {
 	it('appends entry to history', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await recordAction(db, id, {
 			teamIndex: 0,
 			player: 'Anonymous',
@@ -94,7 +99,7 @@ describe('recordAction', () => {
 	});
 
 	it('accumulates multiple entries', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await recordAction(db, id, {
 			teamIndex: 0,
 			player: 'Anonymous',
@@ -125,7 +130,7 @@ describe('recordAction', () => {
 
 describe('undoLastAction', () => {
 	it('removes last entry from history', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await recordAction(db, id, {
 			teamIndex: 0,
 			player: 'Anonymous',
@@ -145,7 +150,7 @@ describe('undoLastAction', () => {
 	});
 
 	it('does nothing on empty history', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await undoLastAction(db, id);
 		const game = await db.games.get(id);
 		expect(game?.history).toEqual([]);
@@ -158,7 +163,7 @@ describe('undoLastAction', () => {
 
 describe('completeGame', () => {
 	it('sets status to completed', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await completeGame(db, id);
 		const game = await db.games.get(id);
 		expect(game?.status).toBe('completed');
@@ -166,7 +171,7 @@ describe('completeGame', () => {
 
 	it('sets endedAt timestamp', async () => {
 		const before = new Date();
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 		await completeGame(db, id);
 		const after = new Date();
 		const game = await db.games.get(id);
@@ -178,8 +183,8 @@ describe('completeGame', () => {
 
 describe('Active game constraint', () => {
 	it('only one active game returned at a time (first in wins)', async () => {
-		await createGame(db, 'Team A', 'Team B');
-		await createGame(db, 'Team C', 'Team D');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
+		await createGame(db, { team1Name: 'Team C', team2Name: 'Team D' });
 		const active = await getActiveGame(db);
 		expect(active?.team1Name).toBe('Team A');
 	});
@@ -187,7 +192,12 @@ describe('Active game constraint', () => {
 
 describe('recordRound', () => {
 	it('appends round correctly', async () => {
-		const id = await createGame(db, 'Team A', 'Team B', ['Alice', 'Bob'], ['Charlie', 'Dave']);
+		const id = await createGame(db, {
+			team1Name: 'Team A',
+			team2Name: 'Team B',
+			team1Players: ['Alice', 'Bob'],
+			team2Players: ['Charlie', 'Dave'],
+		});
 		await recordRound(db, id, 0, 3);
 		const game = await db.games.get(id);
 		expect(game?.rounds).toHaveLength(1);
@@ -197,28 +207,43 @@ describe('recordRound', () => {
 	});
 
 	it('sets expectedThrows to 6 for 1v1', async () => {
-		const id = await createGame(db, 'A', 'B', ['Alice'], ['Bob']);
+		const id = await createGame(db, {
+			team1Name: 'A',
+			team2Name: 'B',
+			team1Players: ['Alice'],
+			team2Players: ['Bob'],
+		});
 		await recordRound(db, id, 0, 1);
 		const game = await db.games.get(id);
 		expect(game?.rounds[0]?.expectedThrows).toBe(6);
 	});
 
 	it('sets expectedThrows to 12 for 2v2', async () => {
-		const id = await createGame(db, 'A', 'B', ['A1', 'A2'], ['B1', 'B2']);
+		const id = await createGame(db, {
+			team1Name: 'A',
+			team2Name: 'B',
+			team1Players: ['A1', 'A2'],
+			team2Players: ['B1', 'B2'],
+		});
 		await recordRound(db, id, 0, 1);
 		const game = await db.games.get(id);
 		expect(game?.rounds[0]?.expectedThrows).toBe(12);
 	});
 
 	it('sets expectedThrows to 12 for 3v3', async () => {
-		const id = await createGame(db, 'A', 'B', ['A1', 'A2', 'A3'], ['B1', 'B2', 'B3']);
+		const id = await createGame(db, {
+			team1Name: 'A',
+			team2Name: 'B',
+			team1Players: ['A1', 'A2', 'A3'],
+			team2Players: ['B1', 'B2', 'B3'],
+		});
 		await recordRound(db, id, 0, 1);
 		const game = await db.games.get(id);
 		expect(game?.rounds[0]?.expectedThrows).toBe(12);
 	});
 
 	it('stays in-progress at target score (no auto-complete)', async () => {
-		const id = await createGame(db, 'A', 'B');
+		const id = await createGame(db, { team1Name: 'A', team2Name: 'B' });
 		await recordRound(db, id, 0, 13);
 		const game = await db.games.get(id);
 		expect(game?.status).toBe('in-progress');
@@ -226,7 +251,12 @@ describe('recordRound', () => {
 	});
 
 	it('records dead-end round with null scoringTeamIndex', async () => {
-		const id = await createGame(db, 'Team A', 'Team B', ['Alice', 'Bob'], ['Charlie', 'Dave']);
+		const id = await createGame(db, {
+			team1Name: 'Team A',
+			team2Name: 'Team B',
+			team1Players: ['Alice', 'Bob'],
+			team2Players: ['Charlie', 'Dave'],
+		});
 		await recordRound(db, id, null, 0);
 		const game = await db.games.get(id);
 		expect(game?.rounds).toHaveLength(1);
@@ -241,7 +271,7 @@ describe('recordRound', () => {
 
 describe('recordAction round/throwIndex', () => {
 	it('stamps round and throwIndex on throws', async () => {
-		const id = await createGame(db, 'A', 'B');
+		const id = await createGame(db, { team1Name: 'A', team2Name: 'B' });
 		await recordAction(db, id, {
 			teamIndex: 0,
 			player: 'Anonymous',
@@ -262,7 +292,7 @@ describe('recordAction round/throwIndex', () => {
 	});
 
 	it('resets throwIndex after round scored', async () => {
-		const id = await createGame(db, 'A', 'B');
+		const id = await createGame(db, { team1Name: 'A', team2Name: 'B' });
 		await recordAction(db, id, {
 			teamIndex: 0,
 			player: 'Anonymous',

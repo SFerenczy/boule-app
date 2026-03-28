@@ -18,9 +18,9 @@ build:
 preview:
     pnpm exec vite preview
 
-# Run tests once
+# Run tests once (with coverage)
 test:
-    pnpm exec vitest run
+    pnpm exec vitest run --coverage
 
 # Tests in watch mode
 test-watch:
@@ -42,8 +42,26 @@ format-check:
 typecheck:
     pnpm exec svelte-kit sync && pnpm exec svelte-check
 
+# Dead code/export detection
+knip:
+    pnpm exec knip
+
+# Audit production dependencies for high/critical vulnerabilities
+audit:
+    pnpm audit --prod --audit-level=high
+
 # Full quality gate
-check: format-check lint typecheck test
+check: format-check lint typecheck test knip
+
+# Check bundle size against budget (requires build)
+bundle-check:
+    just build
+    bash scripts/bundle-check.sh
+
+# Run Lighthouse CI (builds first, too slow for `just check`)
+lighthouse:
+    just build
+    pnpm exec lhci autorun
 
 # Run Playwright E2E tests
 e2e *args='':

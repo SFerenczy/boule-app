@@ -126,9 +126,10 @@
 			: undefined,
 	);
 
-	const modalPlayers = $derived(
-		pendingAction ? (pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players) : [],
-	);
+	const modalPlayers = $derived.by(() => {
+		if (!pendingAction) return [];
+		return pendingAction.teamIndex === 0 ? game.team1Players : game.team2Players;
+	});
 
 	const allThrown = $derived(
 		roundProgress !== undefined &&

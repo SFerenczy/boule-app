@@ -17,7 +17,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('shows ScoringScreen after creating a game', async () => {
-		await createGame(db, 'Alpha', 'Beta');
+		await createGame(db, { team1Name: 'Alpha', team2Name: 'Beta' });
 
 		render(Page);
 
@@ -29,7 +29,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('shows stat rows for both teams', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 
@@ -39,7 +39,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('updates stats when success button is tapped', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');
@@ -53,7 +53,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('end game returns to NewGameForm', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');
@@ -66,7 +66,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('updates stats when fail button is tapped', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');
@@ -80,7 +80,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('shows correct percentage with mixed success and fail', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		// Set up stats via repository to avoid double-tap guard timing issues
 		await recordAction(db, id, {
@@ -110,7 +110,7 @@ describe('Scoring Screen Page', () => {
 	});
 
 	it('end game button with confirm shows game over screen', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');
@@ -156,7 +156,7 @@ describe('Scoring Screen Page', () => {
 
 describe('Undo functionality', () => {
 	it('undo reverts last stat increment', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');
@@ -178,7 +178,7 @@ describe('Undo functionality', () => {
 	});
 
 	it('undo button is disabled when no history', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');
@@ -190,7 +190,7 @@ describe('Undo functionality', () => {
 
 describe('Per-team success summary', () => {
 	it('shows combined percentage across pointing and shooting', async () => {
-		const id = await createGame(db, 'Team A', 'Team B');
+		const id = await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		// 2 pointing successes, 1 pointing fail, 1 shooting success = 3/4 = 75%
 		await recordAction(db, id, {
@@ -226,7 +226,7 @@ describe('Per-team success summary', () => {
 	});
 
 	it('shows dash when no data', async () => {
-		await createGame(db, 'Team A', 'Team B');
+		await createGame(db, { team1Name: 'Team A', team2Name: 'Team B' });
 
 		render(Page);
 		await screen.findAllByText('Team A');

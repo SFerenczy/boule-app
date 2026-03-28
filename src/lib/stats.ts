@@ -13,19 +13,22 @@ export interface DerivedTotals {
 	readonly percentage: number | null;
 }
 
+const statsKey = (
+	category: 'pointing' | 'shooting',
+	type: 'success' | 'fail',
+): keyof DerivedStats => {
+	if (category === 'pointing') {
+		return type === 'success' ? 'pointingSuccess' : 'pointingFail';
+	}
+	return type === 'success' ? 'shootingSuccess' : 'shootingFail';
+};
+
 export const deriveTeamStats = (history: readonly HistoryEntry[], teamIndex: 0 | 1): DerivedStats =>
 	history
 		.filter((e) => e.teamIndex === teamIndex)
 		.reduce<DerivedStats>(
 			(acc, e) => {
-				const key =
-					e.category === 'pointing'
-						? e.type === 'success'
-							? 'pointingSuccess'
-							: 'pointingFail'
-						: e.type === 'success'
-							? 'shootingSuccess'
-							: 'shootingFail';
+				const key = statsKey(e.category, e.type);
 				return { ...acc, [key]: acc[key] + 1 };
 			},
 			{ pointingSuccess: 0, pointingFail: 0, shootingSuccess: 0, shootingFail: 0 },
@@ -50,16 +53,14 @@ export const deriveTotals = (stats: DerivedStats): DerivedTotals => {
 	return { totalSuccesses, totalAttempts, percentage };
 };
 
+const addRoundScore = (acc: readonly [number, number], r: Round): readonly [number, number] => {
+	if (r.scoringTeamIndex === null) return acc;
+	if (r.scoringTeamIndex === 0) return [acc[0] + r.points, acc[1]];
+	return [acc[0], acc[1] + r.points];
+};
+
 export const deriveScore = (rounds: readonly Round[]): readonly [number, number] =>
-	rounds.reduce<readonly [number, number]>(
-		(acc, r) =>
-			r.scoringTeamIndex === null
-				? acc
-				: r.scoringTeamIndex === 0
-					? [acc[0] + r.points, acc[1]]
-					: [acc[0], acc[1] + r.points],
-		[0, 0],
-	);
+	rounds.reduce<readonly [number, number]>(addRoundScore, [0, 0]);
 
 export const boulesPerPlayer = (playerCount: number): number => (playerCount <= 2 ? 3 : 2);
 
@@ -105,6 +106,15 @@ export interface RoundHistoryEntry {
 	readonly isDeadEnd: boolean;
 }
 
+const teamNameForRound = (
+	scoringTeamIndex: 0 | 1 | null,
+	team1Name: string,
+	team2Name: string,
+): string | null => {
+	if (scoringTeamIndex === null) return null;
+	return scoringTeamIndex === 0 ? team1Name : team2Name;
+};
+
 export const deriveRoundHistory = (
 	rounds: readonly Round[],
 	team1Name: string,
@@ -112,7 +122,7 @@ export const deriveRoundHistory = (
 ): readonly RoundHistoryEntry[] =>
 	rounds.map((r, i) => ({
 		roundNumber: i + 1,
-		teamName: r.scoringTeamIndex === null ? null : r.scoringTeamIndex === 0 ? team1Name : team2Name,
+		teamName: teamNameForRound(r.scoringTeamIndex, team1Name, team2Name),
 		points: r.points,
 		isDeadEnd: r.scoringTeamIndex === null,
 	}));

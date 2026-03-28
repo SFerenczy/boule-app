@@ -2,18 +2,19 @@ import type { BoubleDB } from './database';
 import type { Game, HistoryEntry, Round } from '$lib/types';
 import { boulesPerPlayer } from '$lib/stats';
 
-export const createGame = async (
-	db: BoubleDB,
-	team1Name: string,
-	team2Name: string,
-	team1Players: readonly string[] = ['Anonymous'],
-	team2Players: readonly string[] = ['Anonymous'],
-): Promise<number> => {
+interface CreateGameOptions {
+	readonly team1Name: string;
+	readonly team2Name: string;
+	readonly team1Players?: readonly string[];
+	readonly team2Players?: readonly string[];
+}
+
+export const createGame = async (db: BoubleDB, options: CreateGameOptions): Promise<number> => {
 	const game: Omit<Game, 'id'> = {
-		team1Name,
-		team2Name,
-		team1Players,
-		team2Players,
+		team1Name: options.team1Name,
+		team2Name: options.team2Name,
+		team1Players: options.team1Players ?? ['Anonymous'],
+		team2Players: options.team2Players ?? ['Anonymous'],
 		history: [],
 		rounds: [],
 		targetScore: 13,

@@ -70,7 +70,7 @@
 		team2Players: readonly string[],
 	) {
 		lastCompletedGame = undefined;
-		await createGame(db, team1Name, team2Name, team1Players, team2Players);
+		await createGame(db, { team1Name, team2Name, team1Players, team2Players });
 	}
 
 	async function handleRecord(

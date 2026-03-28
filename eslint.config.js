@@ -1,6 +1,7 @@
 import eslint from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import functional from 'eslint-plugin-functional';
+import sonarjs from 'eslint-plugin-sonarjs';
 import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import ts from 'typescript-eslint';
@@ -19,8 +20,19 @@ export default ts.config(
 	...ts.configs.strict,
 	...ts.configs.stylistic,
 	...svelte.configs.recommended,
+	sonarjs.configs.recommended,
 	prettier,
 	...svelte.configs.prettier,
+
+	// Complexity rules — keep functions small and simple
+	{
+		rules: {
+			complexity: ['error', 10],
+			'max-depth': ['error', 3],
+			'max-lines-per-function': ['error', { max: 50, skipBlankLines: true, skipComments: true }],
+			'max-params': ['error', 4],
+		},
+	},
 
 	// Functional programming rules (all files)
 	{
@@ -74,6 +86,8 @@ export default ts.config(
 			'functional/no-let': 'off',
 			'@typescript-eslint/no-non-null-assertion': 'off',
 			'@typescript-eslint/explicit-function-return-type': 'off',
+			// Test functions are naturally large — setup + assertions in a single block
+			'max-lines-per-function': 'off',
 		},
 	},
 
@@ -111,6 +125,9 @@ export default ts.config(
 
 			// Component scripts often don't need explicit return types
 			'@typescript-eslint/explicit-function-return-type': 'off',
+
+			// sonarjs/deprecation crashes on .svelte files (index out of range bug)
+			'sonarjs/deprecation': 'off',
 		},
 	},
 

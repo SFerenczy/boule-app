@@ -125,8 +125,9 @@ export const getCurrentPlayerName = (games: readonly Game[]): string | null => {
 		{},
 	);
 
-	return Object.entries(counts).reduce((best, entry) =>
-		entry[1] > (best[1] ?? 0) ? entry : best,
+	return Object.entries(counts).reduce<readonly [string, number]>(
+		(best, entry) => (entry[1] > best[1] ? entry : best),
+		['', 0],
 	)[0];
 };
 
